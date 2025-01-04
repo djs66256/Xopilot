@@ -31,6 +31,13 @@ function useSetup() {
 
   const hasLoadedConfig = useRef(false);
 
+  useEffect(() => {
+    xipc.on()
+    return () => {
+      xipc.off()
+    }
+  })
+
   const handleConfigUpdate = useCallback(
     async (
       initial: boolean,

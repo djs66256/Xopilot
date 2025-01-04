@@ -1,4 +1,4 @@
-import { app, BrowserWindow } from 'electron';
+import { app, BrowserWindow, ipcMain } from 'electron';
 import path from 'path';
 import started from 'electron-squirrel-startup';
 import { SocketIPCServer } from './core/ipc/SocketIPCServer';
@@ -26,6 +26,11 @@ const createWindow = () => {
   } else {
     mainWindow.loadFile(path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/chat.html`));
   }
+
+  ipcMain.on('xipc/postToMain', (event, messageType, data, messageId) => {
+    console.log('xipc/postToMain', messageType, data, messageId);
+    mainWindow.webContents.send('xipc/postToRender', messageType, data, messageId);
+  })
 
   // Open the DevTools.
   mainWindow.webContents.openDevTools();

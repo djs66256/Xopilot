@@ -82,6 +82,8 @@ export class IdeMessenger implements IIdeMessenger {
         }
         window.postIntellijMessage?.(messageType, data, messageId);
         return;
+      } else if (xipc) {
+        xipc.postToMain(messageType, data, messageId)
       } else {
         console.log(
           "Unable to send message: vscode is undefined",
