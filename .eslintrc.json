@@ -18,5 +18,15 @@
     "strict-null-checks",
     "eslint-plugin-react"
   ],
-  "ignorePatterns": ["dist/**/*"]
+  "rules": {
+    "strict-null-checks/all": "warn"
+  },
+  "ignorePatterns": ["dist/**/*"],
+  "settings": {
+    "import/resolver": {
+      "node": {
+        "extensions": [".js", ".jsx", ".ts", ".tsx"]
+      }
+    }
+  }
 }
