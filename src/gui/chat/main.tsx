@@ -17,6 +17,6 @@ import { persistor, store } from "./redux/store";
           </CustomPostHogProvider>
         </PersistGate>
       </Provider>
-    </React.StrictMode>,
+    </React.StrictMode>
   );
 })();

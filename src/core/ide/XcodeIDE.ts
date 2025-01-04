@@ -8,7 +8,7 @@ import { editConfigJson, getConfigJsonPath } from "core/util/paths";
 
 import * as URI from "uri-js";
 
-
+/*
 class XcodeIDE implements IDE {
 
 
@@ -111,3 +111,5 @@ class XcodeIDE implements IDE {
     onDidChangeActiveTextEditor(callback: (fileUri: string) => void): void;
 
 }
+
+*/

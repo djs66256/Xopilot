@@ -1,9 +1,15 @@
 import { defineConfig } from 'vite';
 import { join, resolve } from 'path';
+import react from "@vitejs/plugin-react-swc";
+import tailwindcss from "tailwindcss";
 
 // https://vitejs.dev/config
 export default defineConfig({
   root: resolve(__dirname, "src", "gui"),
+  plugins: [react(), tailwindcss()],
+  resolve: {
+    extensions: ['.tsx', '.ts', '.js', '.jsx'],
+  },
   build: {
     sourcemap: true,
     rollupOptions: {
