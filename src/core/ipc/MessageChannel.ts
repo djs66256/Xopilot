@@ -20,6 +20,23 @@ export class WebviewChannel extends EventEmitter implements MessageChannel {
     private webview?: WebContents,
   ) {
     super();
+    ipcMain.on("xipc/postToMain", this.ipcMainHandler);
+  }
+   // ipc handler for webview to main process
+   private ipcMainHandler(
+    event: Electron.IpcMainEvent,
+    messageType: string,
+    data: any,
+    messageId: string,
+  ) {
+    console.debug("xipc/postToMain", messageType, data, messageId);
+    const id = event.frameId;
+    const peerToken = this.peerTokens.get(id);
+    if (!peerToken) {
+      console.error("no peer token for frameId", id);
+      return;
+    }
+    this.messagenger.postToMain(peerToken, messageType, data, messageId);
   }
 
   onMessage(messageType: string, handler: (data: any) => void): void {
