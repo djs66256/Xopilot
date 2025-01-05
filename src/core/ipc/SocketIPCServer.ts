@@ -1,44 +1,111 @@
-import express from 'express';
-import http from 'node:http';
-import { Server } from 'socket.io';
-import { IPCServer } from './types';
+import express from "express";
+import http from "node:http";
+import { Server, Socket } from "socket.io";
+import { IPCServer } from "./types";
+import { EventEmitter } from "node:stream";
+import { MessageChannel as IPCMessageChannel } from "./MessageChannel";
+import { PeerToken } from "./Message";
 
-export class SocketIPCServer implements IPCServer {
+const HOST = "127.0.0.1";
+const PORT = 56567;
+
+export class SocketChannel implements IPCMessageChannel {
+  constructor(
+    private token: PeerToken,
+    private socket: Socket,
+  ) {}
+  on(event: string, listener: (...args: any[]) => void): this {
+    this.socket.on(event, listener);
+    return this;
+  }
+
+  onMessage(messageType: string, handler: (data: any) => void) {
+    this.socket.on("message", (data) => {
+      if (data.messageType == messageType) {
+        handler(data);
+      }
+    });
+  }
+
+  send(event: string, data: any) {
+    this.socket.emit(event, data);
+  }
+
+  sendMessage(messageType: string, data: any) {
+    this.socket.emit("message", { messageType, data });
+  }
+
+  async invoke(event: string, data: any) {
+    return await this.socket.emitWithAck(event, data);
+  }
+
+  async request(messageType: string, data: any) {
+    return await this.socket.emitWithAck("message", { messageType, data });
+  }
+
+  disconnect() {
+    this.socket.disconnect();
+  }
+
+  get isConnected() {
+    return this.socket.connected;
+  }
+}
+
+export class SocketIPCServer extends EventEmitter implements IPCServer {
   private app = express();
   private server = http.createServer(this.app);
   private io = new Server(this.server, {
     cors: {
-      origin: "127.0.0.1", // 允许所有来源，可以根据需要进行调整
-      methods: ["GET", "POST"]
-    }
+      origin: HOST,
+      methods: ["GET", "POST"],
+    },
   });
-  private port = 56567;
+  private port = PORT;
+  private channels = new Map<string, SocketChannel>();
 
   constructor() {
-    this.setupServer()
+    super();
+    this.setupServer();
   }
 
-  private socket?: SocketIO.Socket;
-
   private setupServer() {
-    this.io.on('connection', (socket) => {
-      console.debug('[IPC] a user connected');
-      this.socket = socket;
+    this.io.on("connection", (socket) => {
+      console.debug(`[IPC] a user connected ${socket.id}`);
+      // get the socket identifier
+      socket
+        .emitWithAck("whoareyou")
+        .then((res) => {
+          console.debug("[IPC] whoareyou: " + res);
+          const id = res.id as string;
+          if (res.type == "inspector" && id) {
+            // success connected!
+            const token = { type: "inspector", id } as PeerToken;
+            const channel = new SocketChannel(token, socket);
+            this.channels.set(socket.id, channel);
 
-      socket.on('disconnect', (reason) => {
-        this.socket = undefined;
-        console.debug('[IPC] socket disconnect: ' + reason);
-      })
+            this.emit("connected", channel);
+          } else {
+            console.error("[IPC] whoareyou error: " + res);
+            socket.disconnect();
+          }
+        })
+        .catch((err) => {
+          socket.disconnect();
+          console.error("[IPC] whoareyou error: " + err);
+        });
 
-      socket.on('message', (msg) => {
-        console.log('message: ' + msg);
-        // 广播消息给所有连接的客户端
-        // io.emit('message', msg);
+      socket.on("disconnect", (reason) => {
+        console.debug("[IPC] socket disconnect: " + reason);
+        const channel = this.channels.get(socket.id);
+        channel.disconnect();
+        this.emit("disconnected", channel);
+        this.channels.delete(socket.id);
       });
     });
-    this.io.engine.on('connection_error', (error) => {
-      console.error('[IPC] socket connection_error: ' + error)
-    })
+    this.io.engine.on("connection_error", (error) => {
+      console.error("[IPC] socket connection_error: " + error);
+    });
   }
 
   public startServer() {
@@ -48,64 +115,7 @@ export class SocketIPCServer implements IPCServer {
   }
 
   public sendMessage(message: string): void {
-    console.log('[IPC] sendMessage: ' + message);
-    if (this.socket) {
-      this.socket.emit('ipc', message);
-    }
-    // this.io.emit('message', message);
-    // this.io.fetchSockets().then((sockets) => {
-    //   for (const socket of sockets) {
-    //     console.log('[IPC] sendMessage: ' + message);
-    //     socket.emit('ipc', message);
-    //   }
-    // });
+    console.log("[IPC] sendMessage: " + message);
+    this.io.sockets.emit("ipc", message);
   }
 }
-
-/*
-// 创建 Express 应用
-const app = express();
-const server = http.createServer(app);
-
-// 创建 Socket.IO 服务器
-const io = new Server(server, {
-  cors: {
-    origin: "127.0.0.1", // 允许所有来源，可以根据需要进行调整
-    methods: ["GET", "POST"]
-  }
-});
-
-app.get('/', (req, res) => {
-  res.send('Hello World!');
-});
-
-
-// 启动服务器
-const PORT = process.env.PORT || 56567;
-
-export function startServer() {
-
-// 监听连接事件
-  io.on('connection', (socket) => {
-    console.log('a user connected');
-  
-    socket.emit("message", "hello")
-  
-    // 监听自定义事件
-    socket.on('message', (msg) => {
-      console.log('message: ' + msg);
-      // 广播消息给所有连接的客户端
-      // io.emit('message', msg);
-    });
-  
-    // 监听断开连接事件
-    socket.on('disconnect', () => {
-      console.log('user disconnected');
-    });
-  });
-
-  server.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
-  });
-}
-*/
