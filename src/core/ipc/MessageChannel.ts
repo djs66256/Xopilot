@@ -1,6 +1,5 @@
 import { ipcMain, WebContents } from "electron";
 import { EventEmitter } from "stream";
-import { PeerToken } from "./Message";
 
 export interface MessageChannel extends EventEmitter {
   onMessage(messageType: string, handler: (data: any) => void): void;

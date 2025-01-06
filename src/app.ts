@@ -1,8 +1,5 @@
 import { BrowserWindow } from "electron";
 import { SocketIPCServer } from "./core/ipc/SocketIPCServer";
-import path from "path";
-import { WebviewChannel } from "./core/ipc/MessageChannel";
-import { PeerToken } from "./core/ipc/Message";
 import { ProjectManager } from "./core/project/ProjectManager";
 
 export class App {
@@ -64,7 +61,7 @@ export class App {
   //   }
   //   this.messagenger.postToMain(peerToken, messageType, data, messageId);
   // }
-
+/*
   windowForPeer(peerToken: PeerToken): BrowserWindow | undefined {
     for (const [id, token] of this.peerTokens) {
       if (token == peerToken) {
@@ -140,4 +137,5 @@ export class App {
       mainWindow.webContents.openDevTools();
     }
   }
+    */
 }

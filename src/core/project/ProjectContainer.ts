@@ -1,10 +1,9 @@
-import { BrowserWindow } from "electron";
 import { XcodeIDE } from "../ide/XcodeIDE";
 import { ProjectMessenger } from "../ipc/ProjectMessenger";
 import { MessageChannel, WebviewChannel } from "../ipc/MessageChannel";
 import { Core } from "core/core";
-import { InProcessMessenger } from "continue/core/protocol/messenger";
-import { FromCoreProtocol, ToCoreProtocol } from "continue/core/protocol";
+import { InProcessMessenger } from "core/protocol/messenger";
+import { FromCoreProtocol, ToCoreProtocol } from "core/protocol";
 import { BrowserWindowHost } from "./BrowserWindowHost";
 
 

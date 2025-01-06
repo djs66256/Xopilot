@@ -20,9 +20,7 @@ import type {
   ToastType,
 } from "core";
 
-
 export class XcodeIDE implements IDE {
-
 
     getIdeInfo(): Promise<IdeInfo> {
       return Promise.resolve({

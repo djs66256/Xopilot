@@ -1,6 +1,5 @@
 import { InProcessMessenger } from "core/protocol/messenger";
-import { PeerToken } from "./Message";
-import { MessageChannel, WebviewChannel } from "./MessageChannel";
+import { MessageChannel } from "./MessageChannel";
 import { FromCoreProtocol, ToCoreProtocol } from "core/protocol";
 import {
   CORE_TO_WEBVIEW_PASS_THROUGH,

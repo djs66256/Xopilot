@@ -1,9 +1,6 @@
-import { app, BrowserWindow, ipcMain } from 'electron';
-import path from 'path';
+import { app } from 'electron';
 import started from 'electron-squirrel-startup';
-import { SocketIPCServer } from './core/ipc/SocketIPCServer';
 import {App} from './app';
-import { chatPeerToken } from './core/ipc/Message';
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (started) {

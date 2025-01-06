@@ -1,10 +1,9 @@
 import express from "express";
 import http from "node:http";
+import { EventEmitter } from "events";
 import { Server, Socket } from "socket.io";
 import { IPCServer } from "./types";
-import { EventEmitter } from "node:stream";
 import { MessageChannel as IPCMessageChannel } from "./MessageChannel";
-import { PeerToken } from "./Message";
 
 const HOST = "127.0.0.1";
 const PORT = 56567;
