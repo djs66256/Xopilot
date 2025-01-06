@@ -6,58 +6,67 @@ import { InProcessMessenger } from "core/protocol/messenger";
 import { FromCoreProtocol, ToCoreProtocol } from "core/protocol";
 import { BrowserWindowHost } from "./BrowserWindowHost";
 
-
 export class ProjectContainer {
-  private ide = new XcodeIDE();
+  private ide: XcodeIDE;
 
   private _insepectChannel: MessageChannel | null = null;
   private _chatChannel: MessageChannel | null = null;
-  private inProcessMessenger = new InProcessMessenger<
+  private inProcessMessenger: InProcessMessenger<
     ToCoreProtocol,
     FromCoreProtocol
-  >();
+  >;
 
-  private chatWindow = new BrowserWindowHost()
+  private chatWindow = new BrowserWindowHost();
   private messenger = new ProjectMessenger();
-  // core = new Core(this.inProcessMessenger, this.ide, async (log: string) => {
-    // outputChannel.appendLine(
-    //   "==========================================================================",
-    // );
-    // outputChannel.appendLine(
-    //   "==========================================================================",
-    // );
-    // outputChannel.append(log);
-  // });
+  private core: Core;
 
-  constructor(
-    project: Project
-  ) {
+  constructor(project: Project) {
     // this.configHandler = this.core.configHandler;
     // resolveConfigHandler?.(this.configHandler);
     // this.configHandler.loadConfig();
-    
-    this.chatWindow.on('create', (window)=>{
+    try {
+    this.inProcessMessenger = new InProcessMessenger<
+      ToCoreProtocol,
+      FromCoreProtocol
+    >();
+    this.ide = new XcodeIDE();
+    this.core = new Core(
+      this.inProcessMessenger,
+      this.ide,
+      async (log: string) => {
+        // outputChannel.appendLine(
+        //   "==========================================================================",
+        // );
+        // outputChannel.appendLine(
+        //   "==========================================================================",
+        // );
+        // outputChannel.append(log);
+      },
+    );
+  } catch (e) {
+    console.log("Error creating core", e);
+  }
+
+    this.chatWindow.on("create", (window) => {
       const channel = new WebviewChannel(project, window.webContents);
       this.messenger.webviewChannel = channel;
-    })
-    this.chatWindow.on('close', (window)=>{
+    });
+    this.chatWindow.on("close", (window) => {
       this.messenger.webviewChannel = null;
-    })
+    });
   }
 
   destroy() {
     this.chatWindow.removeAllListeners();
   }
 
-  set insepectChannel(channel: MessageChannel | null) {
-
-  }
+  set insepectChannel(channel: MessageChannel | null) {}
 
   get insepectChannel(): MessageChannel | null {
     return this._insepectChannel;
   }
 
-  openChatBrowserWindow(options: {create: Boolean} = {create: true}) {
+  openChatBrowserWindow(options: { create: Boolean } = { create: true }) {
     return this.chatWindow.open(options);
   }
 }
