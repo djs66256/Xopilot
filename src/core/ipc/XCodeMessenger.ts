@@ -1,9 +1,9 @@
-import { ToCoreFromIdeOrWebviewProtocol } from "continue/core/protocol/core";
+import { ToCoreFromIdeOrWebviewProtocol } from "core/protocol/core";
 import {
   ToWebviewOrCoreFromIdeProtocol,
   ToIdeFromWebviewOrCoreProtocol,
-} from "continue/core/protocol/ide";
-import { ToWebviewFromIdeOrCoreProtocol } from "continue/core/protocol/webview";
+} from "core/protocol/ide";
+import { ToWebviewFromIdeOrCoreProtocol } from "core/protocol/webview";
 import { FromWebviewProtocol, ToWebviewProtocol } from "core/protocol";
 import { IMessenger, Message } from "core/protocol/messenger";
 import { SocketChannel } from "./SocketIPCServer";

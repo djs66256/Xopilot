@@ -19,7 +19,7 @@ export class ProjectContainer {
 
   private chatWindow = new BrowserWindowHost()
   private messenger = new ProjectMessenger();
-  core = new Core(this.inProcessMessenger, this.ide, async (log: string) => {
+  // core = new Core(this.inProcessMessenger, this.ide, async (log: string) => {
     // outputChannel.appendLine(
     //   "==========================================================================",
     // );
@@ -27,7 +27,7 @@ export class ProjectContainer {
     //   "==========================================================================",
     // );
     // outputChannel.append(log);
-  });
+  // });
 
   constructor(
     project: Project

@@ -1,9 +1,9 @@
-import * as child_process from "node:child_process";
-import { exec } from "node:child_process";
+// import * as child_process from "node:child_process";
+// import { exec } from "node:child_process";
 
-import { EXTENSION_NAME } from "core/control-plane/env";
+// import { EXTENSION_NAME } from "core/control-plane/env";
 import { GetGhTokenArgs } from "core/protocol/ide";
-import { editConfigJson, getConfigJsonPath } from "core/util/paths";
+// import { editConfigJson, getConfigJsonPath } from "core/util/paths";
 
 import type {
   Range,
@@ -18,10 +18,10 @@ import type {
   RangeInFile,
   Thread,
   ToastType,
+  FileStatsMap,
 } from "core";
 
 export class XcodeIDE implements IDE {
-
     getIdeInfo(): Promise<IdeInfo> {
       return Promise.resolve({
         ideType: "xcode",
@@ -93,6 +93,11 @@ export class XcodeIDE implements IDE {
     fileExists(fileUri: string): Promise<boolean> {
       return Promise.resolve(false);
     }
+
+    getFileStats(files: string[]): Promise<FileStatsMap> {
+      throw new Error("Method not implemented.");
+    }
+
   
     writeFile(path: string, contents: string): Promise<void> {
       return Promise.resolve();

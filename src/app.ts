@@ -1,6 +1,7 @@
 import { BrowserWindow } from "electron";
 import { SocketIPCServer } from "./core/ipc/SocketIPCServer";
 import { ProjectManager } from "./core/project/ProjectManager";
+import { emptyProject } from "./core/project/Project";
 
 export class App {
   private projectManager = new ProjectManager()

@@ -15,21 +15,8 @@ export class SocketChannel extends EventEmitter implements IPCMessageChannel {
   ) {
     super();
   }
-  on(event: string, listener: (...args: any[]) => void): this {
-    this.socket.on(event, listener);
-    return this;
-  }
-
-  onMessage(messageType: string, handler: (data: any) => void) {
-    this.socket.on("message", (data) => {
-      if (data.messageType == messageType) {
-        handler(data);
-      }
-    });
-  }
-
-  send(event: string, data: any) {
-    this.socket.emit(event, data);
+  onMessage(messageType: string, handler: (data: any) => void): void {
+    throw new Error("Method not implemented.");
   }
 
   sendMessage(messageType: string, data: any) {
@@ -71,6 +58,7 @@ export class SocketIPCServer extends EventEmitter implements IPCServer {
   }
 
   private setupServer() {
+    return;
     this.io.on("connection", (socket) => {
       console.debug(`[IPC] a user connected ${socket.id}`);
       // get the socket identifier
