@@ -2,7 +2,7 @@ import { ipcMain, WebContents } from "electron";
 import { EventEmitter } from "stream";
 import { PeerToken } from "./Message";
 
-export interface MessageChannel {
+export interface MessageChannel extends EventEmitter {
   onMessage(messageType: string, handler: (data: any) => void): void;
 
   sendMessage(messageType: string, data: any): void;
@@ -17,10 +17,12 @@ export interface MessageChannel {
 export class WebviewChannel extends EventEmitter implements MessageChannel {
   constructor(
     private peerToken: PeerToken,
-    private webview?: WebContents,
+    private webview: WebContents,
   ) {
     super();
-    ipcMain.on("xipc/postToMain", this.ipcMainHandler);
+    this.ipcMainHandler = this.ipcMainHandler.bind(this);
+    
+    this.connect()
   }
    // ipc handler for webview to main process
    private ipcMainHandler(
@@ -29,14 +31,10 @@ export class WebviewChannel extends EventEmitter implements MessageChannel {
     data: any,
     messageId: string,
   ) {
-    console.debug("xipc/postToMain", messageType, data, messageId);
-    const id = event.frameId;
-    const peerToken = this.peerTokens.get(id);
-    if (!peerToken) {
-      console.error("no peer token for frameId", id);
-      return;
+    if (event.frameId == this.webview.id) {
+      console.debug("xipc/postToMain", messageType, data, messageId);
+      this.emit(messageType, data)
     }
-    this.messagenger.postToMain(peerToken, messageType, data, messageId);
   }
 
   onMessage(messageType: string, handler: (data: any) => void): void {
@@ -54,8 +52,12 @@ export class WebviewChannel extends EventEmitter implements MessageChannel {
   request(messageType: string, data: any): Promise<any> {
     throw new Error("Method not implemented.");
   }
+
+  connect(): void {
+    ipcMain.on("xipc/postToMain", this.ipcMainHandler);
+  }
   disconnect(): void {
-    throw new Error("Method not implemented.");
+    ipcMain.off("xipc/postToMain", this.ipcMainHandler);
   }
   get isConnected(): Boolean {
     throw new Error("Method not implemented.");

@@ -90,7 +90,7 @@ export class App {
     mainWindow.on("close", (e) => {
       this.windows.delete(id);
       this.peerTokens.delete(id);
-      this.messagenger.setChatChannel(peerToken, undefined);
+      this.messagenger.setChatChannel(peerToken, null);
     });
 
     // Open the DevTools.
