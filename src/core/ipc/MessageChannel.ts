@@ -16,7 +16,7 @@ export interface MessageChannel extends EventEmitter {
 
 export class WebviewChannel extends EventEmitter implements MessageChannel {
   constructor(
-    private peerToken: PeerToken,
+    private project: Project,
     private webview: WebContents,
   ) {
     super();

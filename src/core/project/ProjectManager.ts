@@ -1,17 +1,30 @@
-import { Project } from "./project";
+import { ProjectContainer } from "./ProjectContainer";
 
 
 export class ProjectManager {
-  private static instance: ProjectManager;
-  private projects: Map<string, Project> = new Map();
+  private projects: Map<string, ProjectContainer> = new Map();
 
   constructor() {
     
   }
 
-  createProject(param: {projectId: string, projectName: string}) {
-    const project = new Project(param.projectId, param.projectName);
-    this.projects.set(param.projectId, project);
+  destroy() {
+    for (const [, project] of this.projects) {
+      project.destroy();
+    }
+  }
+
+  getProjectContainer(project: Project): ProjectContainer {
+    let container = this.projects.get(project.id);
+    if (!container) {
+      container = new ProjectContainer(project);
+      this.projects.set(project.id, container);
+    }
+    return container;
+  }
+
+  deleteProjectContainer(project: Project) {
+    this.projects.delete(project.id);
   }
 
 }

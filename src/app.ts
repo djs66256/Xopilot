@@ -1,6 +1,5 @@
-import { BrowserWindow, ipcMain } from "electron";
+import { BrowserWindow } from "electron";
 import { SocketIPCServer } from "./core/ipc/SocketIPCServer";
-import { XCodeMessenger } from "./core/ipc/XCodeMessenger";
 import path from "path";
 import { WebviewChannel } from "./core/ipc/MessageChannel";
 import { PeerToken } from "./core/ipc/Message";
@@ -9,28 +8,44 @@ import { ProjectManager } from "./core/project/ProjectManager";
 export class App {
   private projectManager = new ProjectManager()
   constructor(
-    private messagenger = new XCodeMessenger(),
+    // private messagenger = new XCodeMessenger(),
     private ipcServer = new SocketIPCServer(),
-    private windows: Map<number, BrowserWindow> = new Map(),
-    private peerTokens: Map<number, PeerToken> = new Map(),
+    // private windows: Map<number, BrowserWindow> = new Map(),
+    // private peerTokens: Map<number, PeerToken> = new Map(),
   ) {
     // this.ipcMainHandler = this.ipcMainHandler.bind(this);
   }
 
-  start() {
+  onReady() {
     this.ipcServer.on("connected", (channel) => {
-      this.messagenger.createChannel(channel);
+      const project = this.projectManager.getProjectContainer(channel.project)
+      project.insepectChannel = channel;
     });
     this.ipcServer.on("disconnected", (channel) => {
-      this.messagenger.destroyChannel(channel);
+      const project = this.projectManager.getProjectContainer(channel.project)
+      project.insepectChannel = null;
     });
 
     // ipcMain.on("xipc/postToMain", this.ipcMainHandler);
+    // TODO: open empty project
+    const projectContainer = this.projectManager.getProjectContainer(emptyProject)
+    projectContainer.openChatBrowserWindow();
   }
 
-  stop() {
-    this.messagenger.destroyAll();
-    // ipcMain.off("xipc/postToMain", this.ipcMainHandler);
+  onActivate() {
+    if (BrowserWindow.getAllWindows().length === 0) {
+      // TODO: MAY open settings window?
+      const projectContainer = this.projectManager.getProjectContainer(emptyProject)
+      projectContainer.openChatBrowserWindow();
+    }
+  }
+
+  onWindowAllClosed() {
+
+  }
+
+  onWillQuit() {
+    this.projectManager.destroy();
   }
 
   // ipc handler for webview to main process

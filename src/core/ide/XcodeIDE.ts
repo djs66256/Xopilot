@@ -135,7 +135,7 @@ export class XcodeIDE implements IDE {
     getOpenFiles(): Promise<string[]> {
       return Promise.resolve([]);
     }
-  
+
     getCurrentFile(): Promise<
       | undefined
       | {

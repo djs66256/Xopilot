@@ -11,9 +11,11 @@ const PORT = 56567;
 
 export class SocketChannel extends EventEmitter implements IPCMessageChannel {
   constructor(
-    private token: PeerToken,
+    private project: Project,
     private socket: Socket,
-  ) {}
+  ) {
+    super();
+  }
   on(event: string, listener: (...args: any[]) => void): this {
     this.socket.on(event, listener);
     return this;
@@ -80,8 +82,8 @@ export class SocketIPCServer extends EventEmitter implements IPCServer {
           const id = res.id as string;
           if (res.type == "inspector" && id) {
             // success connected!
-            const token = { type: "inspector", id } as PeerToken;
-            const channel = new SocketChannel(token, socket);
+            const project = {id: "xxx", documentUrl: 'xxx'} as Project;
+            const channel = new SocketChannel(project, socket);
             this.channels.set(socket.id, channel);
 
             this.emit("connected", channel);

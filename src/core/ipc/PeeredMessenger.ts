@@ -15,7 +15,7 @@ export class PeeredMessenger {
 
   private _webviewChannel: MessageChannel | null = null;
   constructor(
-    peerToken: PeerToken,
+    // peerToken: PeerToken,
     // private inspector: XCodeInspector,
     // private ide: XCodeIde,
     // private chat: any,
