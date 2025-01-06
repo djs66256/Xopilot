@@ -9,7 +9,7 @@ import { IMessenger, Message } from "core/protocol/messenger";
 import { SocketChannel } from "./SocketIPCServer";
 import { MessageChannel, WebviewChannel } from "./MessageChannel";
 import { PeerToken } from "./Message";
-import { PeeredMessenger } from "./PeeredMessenger";
+import { ProjectMessenger } from "./ProjectMessenger";
 
 class XCodeInspector {}
 
@@ -61,7 +61,7 @@ class XCodeMessangerChannel {
 }
 
 export class XCodeMessenger {
-  private peers: Map<PeerToken, PeeredMessenger> = new Map();
+  private peers: Map<PeerToken, ProjectMessenger> = new Map();
   // private settings;
 
   setChatChannel(peerToken: PeerToken, channel: MessageChannel | null) {
@@ -70,7 +70,7 @@ export class XCodeMessenger {
       peer.webviewChannel = channel;
     } else {
       if (channel) {
-        peer = new PeeredMessenger(peerToken);
+        peer = new ProjectMessenger(peerToken);
         peer.webviewChannel = channel;
         this.peers.set(peerToken, peer);
       }

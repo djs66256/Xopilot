@@ -7,7 +7,7 @@ import {
   WEBVIEW_TO_CORE_PASS_THROUGH,
 } from "core/protocol/passThrough";
 
-export class PeeredMessenger {
+export class ProjectMessenger {
   private inProcessMessenger = new InProcessMessenger<
     ToCoreProtocol,
     FromCoreProtocol

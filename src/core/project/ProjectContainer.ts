@@ -1,6 +1,6 @@
 import { BrowserWindow } from "electron";
 import { XcodeIDE } from "../ide/XcodeIDE";
-import { PeeredMessenger } from "../ipc/PeeredMessenger";
+import { ProjectMessenger } from "../ipc/ProjectMessenger";
 import { MessageChannel, WebviewChannel } from "../ipc/MessageChannel";
 import { Core } from "core/core";
 import { InProcessMessenger } from "continue/core/protocol/messenger";
@@ -19,7 +19,7 @@ export class ProjectContainer {
   >();
 
   private chatWindow = new BrowserWindowHost()
-  private messenger = new PeeredMessenger();
+  private messenger = new ProjectMessenger();
   core = new Core(this.inProcessMessenger, this.ide, async (log: string) => {
     // outputChannel.appendLine(
     //   "==========================================================================",
