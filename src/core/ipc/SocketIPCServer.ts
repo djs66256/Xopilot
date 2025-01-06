@@ -9,7 +9,7 @@ import { PeerToken } from "./Message";
 const HOST = "127.0.0.1";
 const PORT = 56567;
 
-export class SocketChannel implements IPCMessageChannel {
+export class SocketChannel extends EventEmitter implements IPCMessageChannel {
   constructor(
     private token: PeerToken,
     private socket: Socket,

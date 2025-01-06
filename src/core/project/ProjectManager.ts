@@ -1,19 +1,17 @@
+import { Project } from "./project";
 
 
-class ProjectManager {
+export class ProjectManager {
   private static instance: ProjectManager;
-  private projects: Map<string, Project> = {};
+  private projects: Map<string, Project> = new Map();
 
-  private constructor() {
+  constructor() {
     
   }
 
-  public static getInstance(): ProjectManager {
-    if (!ProjectManager.instance) {
-      ProjectManager.instance = new ProjectManager();
-    }
-    return ProjectManager.instance;
+  createProject(param: {projectId: string, projectName: string}) {
+    const project = new Project(param.projectId, param.projectName);
+    this.projects.set(param.projectId, project);
   }
 
-  
 }

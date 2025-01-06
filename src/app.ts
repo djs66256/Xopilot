@@ -4,15 +4,17 @@ import { XCodeMessenger } from "./core/ipc/XCodeMessenger";
 import path from "path";
 import { WebviewChannel } from "./core/ipc/MessageChannel";
 import { PeerToken } from "./core/ipc/Message";
+import { ProjectManager } from "./core/project/ProjectManager";
 
 export class App {
+  private projectManager = new ProjectManager()
   constructor(
     private messagenger = new XCodeMessenger(),
     private ipcServer = new SocketIPCServer(),
     private windows: Map<number, BrowserWindow> = new Map(),
     private peerTokens: Map<number, PeerToken> = new Map(),
   ) {
-    this.ipcMainHandler = this.ipcMainHandler.bind(this);
+    // this.ipcMainHandler = this.ipcMainHandler.bind(this);
   }
 
   start() {
@@ -23,30 +25,30 @@ export class App {
       this.messagenger.destroyChannel(channel);
     });
 
-    ipcMain.on("xipc/postToMain", this.ipcMainHandler);
+    // ipcMain.on("xipc/postToMain", this.ipcMainHandler);
   }
 
   stop() {
     this.messagenger.destroyAll();
-    ipcMain.off("xipc/postToMain", this.ipcMainHandler);
+    // ipcMain.off("xipc/postToMain", this.ipcMainHandler);
   }
 
   // ipc handler for webview to main process
-  private ipcMainHandler(
-    event: Electron.IpcMainEvent,
-    messageType: string,
-    data: any,
-    messageId: string,
-  ) {
-    console.debug("xipc/postToMain", messageType, data, messageId);
-    const id = event.frameId;
-    const peerToken = this.peerTokens.get(id);
-    if (!peerToken) {
-      console.error("no peer token for frameId", id);
-      return;
-    }
-    this.messagenger.postToMain(peerToken, messageType, data, messageId);
-  }
+  // private ipcMainHandler(
+  //   event: Electron.IpcMainEvent,
+  //   messageType: string,
+  //   data: any,
+  //   messageId: string,
+  // ) {
+  //   console.debug("xipc/postToMain", messageType, data, messageId);
+  //   const id = event.frameId;
+  //   const peerToken = this.peerTokens.get(id);
+  //   if (!peerToken) {
+  //     console.error("no peer token for frameId", id);
+  //     return;
+  //   }
+  //   this.messagenger.postToMain(peerToken, messageType, data, messageId);
+  // }
 
   windowForPeer(peerToken: PeerToken): BrowserWindow | undefined {
     for (const [id, token] of this.peerTokens) {
