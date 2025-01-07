@@ -19,7 +19,8 @@
         "ELECTRON_ENABLE_LOGGING": "true",
         "ELECTRON_ENABLE_STACK_DUMPING": "true",
         "NODE_ENV": "development",
-        "NODE_OPTIONS": "--max-old-space-size=16384"
+        "NODE_OPTIONS": "--max-old-space-size=16384",
+        "CONTINUE_GLOBAL_DIR": "/Users/daniel/Documents/continue"
       },
       "console": "integratedTerminal"
     }

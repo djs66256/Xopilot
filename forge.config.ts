@@ -10,7 +10,19 @@ import { FuseV1Options, FuseVersion } from "@electron/fuses";
 const config: ForgeConfig = {
   packagerConfig: {
     name: "Xopilot",
-    osxSign: {},
+    osxSign: {
+      optionsForFile: (filePath) => {
+        return {
+          entitlements: './entitlements.plist'
+        }
+      }
+    },
+    osxNotarize: {
+      appleId: "",
+      appleIdPassword: "",
+      teamId: ""
+    },
+    appBundleId: "com.djs66256.xopilot",
     asar: true,
   },
   rebuildConfig: {},
