@@ -2,6 +2,9 @@ import { BrowserWindow } from "electron";
 import EventEmitter from "events";
 import path from "path";
 
+declare const MAIN_WINDOW_VITE_DEV_SERVER_URL: string;
+declare const MAIN_WINDOW_VITE_NAME: string;
+
 export class BrowserWindowHost extends EventEmitter {
   mainWindow: BrowserWindow | null = null;
 

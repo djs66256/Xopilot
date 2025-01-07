@@ -11,6 +11,7 @@ export default defineConfig({
     extensions: ['.tsx', '.ts', '.js', '.jsx'],
   },
   build: {
+    minify: false,
     sourcemap: true,
     rollupOptions: {
       input: {
