@@ -11,9 +11,9 @@
   "license": "MIT",
   "main": ".vite/build/main.js",
   "scripts": {
-    "start": "electron-forge start",
-    "package": "electron-forge package",
-    "make": "electron-forge make",
+    "start": "export NODE_OPTIONS=--max-old-space-size=16384; electron-forge start",
+    "package": "export NODE_OPTIONS=--max-old-space-size=16384; electron-forge package",
+    "make": "export NODE_OPTIONS=--max-old-space-size=16384; electron-forge make",
     "publish": "electron-forge publish",
     "lint": "eslint --ext .ts,.tsx .",
     "ipc-server": "node src/ipc-server.mjs",
