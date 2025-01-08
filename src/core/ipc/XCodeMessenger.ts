@@ -9,7 +9,7 @@ import { IMessenger, Message } from "core/protocol/messenger";
 import { SocketChannel } from "./SocketIPCServer";
 import { MessageChannel, WebviewChannel } from "./MessageChannel";
 import { PeerToken } from "./Message";
-import { ProjectMessenger } from "./ProjectMessenger";
+import { ProjectMessenger } from "../messages/ProjectMessenger";
 
 class XCodeInspector {}
 

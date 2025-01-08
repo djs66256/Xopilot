@@ -1,12 +1,29 @@
 import { BrowserWindow } from "electron";
 import EventEmitter from "events";
 import path from "path";
+import { WebviewChannel } from "../messages/WebviewChannel";
 
 declare const MAIN_WINDOW_VITE_DEV_SERVER_URL: string;
 declare const MAIN_WINDOW_VITE_NAME: string;
 
 export class BrowserWindowHost extends EventEmitter {
   mainWindow: BrowserWindow | null = null;
+
+  messageChannel: WebviewChannel
+
+  constructor(project: Project) {
+    super();
+    
+    this.messageChannel = new WebviewChannel(project)
+
+    this.on("create", (window) => {
+      this.messageChannel.webview = window.webContents;
+    });
+
+    this.on("close", (window) => {
+      this.messageChannel.webview = null;
+    });
+  }
 
   open(options: {create: Boolean} = {create: true}) {
     this.getBrowserWindow(options);

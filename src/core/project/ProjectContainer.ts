@@ -1,6 +1,5 @@
 import { XcodeIDE } from "../ide/XcodeIDE";
-import { ProjectMessenger } from "../ipc/ProjectMessenger";
-import { MessageChannel, WebviewChannel } from "../ipc/MessageChannel";
+import { ProjectMessenger } from "../messages/ProjectMessenger";
 import { Core } from "core/core";
 import { InProcessMessenger } from "core/protocol/messenger";
 import { FromCoreProtocol, ToCoreProtocol } from "core/protocol";
@@ -16,8 +15,8 @@ export class ProjectContainer {
     FromCoreProtocol
   >;
 
-  private chatWindow = new BrowserWindowHost();
-  private messenger = new ProjectMessenger();
+  private chatWindow: BrowserWindowHost;
+  private messenger: ProjectMessenger;
   private core: Core;
 
   constructor(project: Project) {
@@ -25,35 +24,34 @@ export class ProjectContainer {
     // resolveConfigHandler?.(this.configHandler);
     // this.configHandler.loadConfig();
     try {
-    this.inProcessMessenger = new InProcessMessenger<
-      ToCoreProtocol,
-      FromCoreProtocol
-    >();
-    this.ide = new XcodeIDE();
-    this.core = new Core(
-      this.inProcessMessenger,
-      this.ide,
-      async (log: string) => {
-        // outputChannel.appendLine(
-        //   "==========================================================================",
-        // );
-        // outputChannel.appendLine(
-        //   "==========================================================================",
-        // );
-        // outputChannel.append(log);
-      },
-    );
-  } catch (e) {
-    console.log("Error creating core", e);
-  }
+      this.chatWindow = new BrowserWindowHost(project);
+      this.inProcessMessenger = new InProcessMessenger<
+        ToCoreProtocol,
+        FromCoreProtocol
+      >();
+      this.ide = new XcodeIDE();
+      this.messenger = new ProjectMessenger(
+        this.inProcessMessenger,
+        this.chatWindow.messageChannel,
+        this.ide
+      )
+      this.core = new Core(
+        this.inProcessMessenger,
+        this.ide,
+        async (log: string) => {
+          // outputChannel.appendLine(
+          //   "==========================================================================",
+          // );
+          // outputChannel.appendLine(
+          //   "==========================================================================",
+          // );
+          // outputChannel.append(log);
+        },
+      );
+    } catch (e) {
+      console.log("Error creating core", e);
+    }
 
-    this.chatWindow.on("create", (window) => {
-      const channel = new WebviewChannel(project, window.webContents);
-      this.messenger.webviewChannel = channel;
-    });
-    this.chatWindow.on("close", (window) => {
-      this.messenger.webviewChannel = null;
-    });
   }
 
   destroy() {
