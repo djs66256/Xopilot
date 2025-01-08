@@ -11,6 +11,7 @@
   "license": "MIT",
   "main": ".vite/build/main.js",
   "scripts": {
+    "postinstall": "electron-builder install-app-deps",
     "start": "export NODE_OPTIONS=--max-old-space-size=16384; electron-forge start",
     "package": "export NODE_OPTIONS=--max-old-space-size=16384; electron-forge package",
     "make": "export NODE_OPTIONS=--max-old-space-size=16384; electron-forge make",
@@ -30,6 +31,7 @@
     "@electron-forge/plugin-vite": "^7.6.0",
     "@electron/fuses": "^1.8.0",
     "@eslint/js": "^9.17.0",
+    "@rollup/plugin-commonjs": "^28.0.2",
     "@swc/cli": "^0.3.14",
     "@swc/core": "^1.7.26",
     "@testing-library/dom": "^10.4.0",
@@ -55,6 +57,7 @@
     "autoprefixer": "^10.4.20",
     "chai": "^5.1.2",
     "electron": "33.2.1",
+    "electron-builder": "^25.1.8",
     "electron-rebuild": "^3.2.9",
     "eslint": "^8.57.1",
     "eslint-plugin-import": "^2.31.0",
