@@ -4,7 +4,7 @@ import { ipcMain, WebContents } from "electron";
 import { EventEmitter } from "node:events";
 import { v4 as uuidv4 } from "uuid";
 
-export class WebviewChannel extends EventEmitter implements WebviewChannel {
+export class WebviewChannel extends EventEmitter {
   webview: WebContents | null = null;
 
   constructor(private project: Project) {

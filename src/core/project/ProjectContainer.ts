@@ -4,12 +4,14 @@ import { Core } from "core/core";
 import { InProcessMessenger } from "core/protocol/messenger";
 import { FromCoreProtocol, ToCoreProtocol } from "core/protocol";
 import { BrowserWindowHost } from "./BrowserWindowHost";
+import { IdeChannel } from "../messages/IdeChannel";
 
 export class ProjectContainer {
   private ide: XcodeIDE;
 
   private _insepectChannel: MessageChannel | null = null;
   private _chatChannel: MessageChannel | null = null;
+  private ideChannel: IdeChannel;
   private inProcessMessenger: InProcessMessenger<
     ToCoreProtocol,
     FromCoreProtocol
@@ -29,10 +31,12 @@ export class ProjectContainer {
         ToCoreProtocol,
         FromCoreProtocol
       >();
+      this.ideChannel = new IdeChannel(project);
       this.ide = new XcodeIDE();
       this.messenger = new ProjectMessenger(
         this.inProcessMessenger,
         this.chatWindow.messageChannel,
+        this.ideChannel,
         this.ide
       )
       this.core = new Core(

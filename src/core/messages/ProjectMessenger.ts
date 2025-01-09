@@ -1,5 +1,4 @@
 import { InProcessMessenger, Message } from "core/protocol/messenger";
-import { MessageChannel } from "../ipc/MessageChannel";
 import {
   FromCoreProtocol,
   FromWebviewProtocol,
@@ -13,6 +12,8 @@ import {
 import { ToIdeFromCoreProtocol } from "continue/core/protocol/ideCore";
 import { ToIdeFromWebviewOrCoreProtocol } from "continue/core/protocol/ide";
 import { XcodeIDE } from "../ide/XcodeIDE";
+import { WebviewChannel } from "./WebviewChannel";
+import { IdeChannel } from "./IdeChannel";
 
 type ToIdeOrWebviewFromCoreProtocol = ToIdeFromCoreProtocol &
   ToWebviewFromCoreProtocol;
@@ -56,6 +57,7 @@ export class ProjectMessenger {
       FromCoreProtocol
     >,
     private readonly webviewChannel: WebviewChannel,
+    private readonly ideChannel: IdeChannel | undefined,
     private readonly ide: XcodeIDE,
   ) {
     /** WEBVIEW ONLY LISTENERS **/

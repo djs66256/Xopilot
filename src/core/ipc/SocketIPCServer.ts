@@ -2,13 +2,11 @@ import express from "express";
 import http from "node:http";
 import { EventEmitter } from "events";
 import { Server, Socket } from "socket.io";
-import { IPCServer } from "./types";
-import { MessageChannel as IPCMessageChannel } from "./MessageChannel";
 
 const HOST = "127.0.0.1";
 const PORT = 56567;
 
-export class SocketChannel extends EventEmitter implements IPCMessageChannel {
+export class SocketChannel extends EventEmitter  {
   constructor(
     private project: Project,
     private socket: Socket,
