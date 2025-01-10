@@ -1,4 +1,5 @@
 import { defineConfig } from "vite";
+import { externalizeDepsPlugin } from "electron-vite";
 import { CopySqlite3 } from "./plugins/vite-plugin-sqlite3";
 
 // https://vitejs.dev/config
@@ -24,6 +25,7 @@ export default defineConfig({
     // },
   },
   plugins: [
+    //externalizeDepsPlugin()
     // CopySqlite3()
   ],
 });
