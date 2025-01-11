@@ -8,6 +8,15 @@ import { v4 as uuidv4 } from "uuid";
 import "vscode-webview";
 import { isJetBrains } from "../util";
 
+// xcode ipc
+declare global {
+  interface Window {
+    xipc: {
+      postToMain: (messageType: string, data: any, messageId: string) => void;
+    };
+  }
+}
+
 interface vscode {
   postMessage(message: any): vscode;
 }
@@ -82,8 +91,8 @@ export class IdeMessenger implements IIdeMessenger {
         }
         window.postIntellijMessage?.(messageType, data, messageId);
         return;
-      } else if (xipc) {
-        xipc.postToMain(messageType, data, messageId)
+      } else if (window.xipc) {
+        window.xipc.postToMain(messageType, data, messageId);
         return;
       } else {
         console.log(
