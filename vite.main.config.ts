@@ -4,6 +4,14 @@ import { CopySqlite3 } from "./plugins/vite-plugin-sqlite3";
 
 // https://vitejs.dev/config
 export default defineConfig({
+  optimizeDeps: {
+    // include: [
+    //   "core",
+    //   "core/core.ts",
+    //   "continue/core",
+    //   "continue/core/core.ts"
+    // ],
+  },
   build: {
     minify: false,
     sourcemap: true,
@@ -15,6 +23,7 @@ export default defineConfig({
         "pg",
         "jsdom",
       //   "onnxruntime",
+        // /node_modules\/[^sa]/
       ],
       output: {
         externalLiveBindings: false,
@@ -25,7 +34,11 @@ export default defineConfig({
     // },
   },
   plugins: [
-    //externalizeDepsPlugin()
+    // externalizeDepsPlugin({
+    //   exclude: [
+    //     "core"
+    //   ]
+    // })
     // CopySqlite3()
   ],
 });
