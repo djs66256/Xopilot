@@ -25,7 +25,7 @@ export class ProjectContainer {
     // this.configHandler = this.core.configHandler;
     // resolveConfigHandler?.(this.configHandler);
     // this.configHandler.loadConfig();
-    try {
+    // try {
       this.chatWindow = new BrowserWindowHost(project);
       this.inProcessMessenger = new InProcessMessenger<
         ToCoreProtocol,
@@ -52,9 +52,9 @@ export class ProjectContainer {
           // outputChannel.append(log);
         },
       );
-    } catch (e) {
-      console.log("Error creating core", e);
-    }
+    // } catch (e) {
+    //   console.log("Error creating core", e);
+    // }
 
   }
 

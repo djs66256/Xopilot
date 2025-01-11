@@ -99,6 +99,7 @@
     "@tiptap/suggestion": "^2.1.13",
     "@types/vscode-webview": "^1.57.1",
     "bufferutil": "^4.0.8",
+    "clipboardy": "^4.0.0",
     "core": "file:./continue/core",
     "dompurify": "^3.0.6",
     "downshift": "^7.6.0",

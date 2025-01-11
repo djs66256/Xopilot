@@ -5,6 +5,3 @@ interface IPCServer {
   sendMessage(message: string): void;
 }
 
-interface IdeChannel {
-  
-}
