@@ -13,6 +13,8 @@ declare global {
   interface Window {
     xipc: {
       postToMain: (messageType: string, data: any, messageId: string) => void;
+      on: () => void;
+      off: () => void;
     };
   }
 }

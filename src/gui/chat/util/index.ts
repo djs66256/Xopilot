@@ -55,6 +55,10 @@ export function isJetBrains() {
   return getLocalStorage("ide") === "jetbrains";
 }
 
+export function isXcode() {
+  return !!(window.xipc)
+}
+
 export function isWebEnvironment(): boolean {
   return (
     typeof window !== "undefined" &&
