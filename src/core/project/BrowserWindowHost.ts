@@ -1,10 +1,20 @@
 import { BrowserWindow } from "electron";
-import EventEmitter from "events";
-import path from "path";
+import EventEmitter from "node:events";
+import path from "node:path";
 import { WebviewChannel } from "../messages/WebviewChannel";
 
 declare const MAIN_WINDOW_VITE_DEV_SERVER_URL: string;
 declare const MAIN_WINDOW_VITE_NAME: string;
+
+export type BrowserWindowHostEvents = {
+  "create": BrowserWindow,
+  "close": BrowserWindow
+}
+
+export declare interface BrowserWindowHost {
+  on<T extends keyof BrowserWindowHostEvents>(event: T, listener: (arg: BrowserWindowHostEvents[T]) => void): this;
+  emit<T extends keyof BrowserWindowHostEvents>(event: T, arg: BrowserWindowHostEvents[T]): boolean;
+}
 
 export class BrowserWindowHost extends EventEmitter {
   mainWindow: BrowserWindow | null = null;
@@ -57,15 +67,6 @@ export class BrowserWindowHost extends EventEmitter {
         path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/chat.html`),
       );
     }
-
-    // // cache the window
-    // const id = mainWindow.id;
-    // this.mainWindow = mainWindow;
-    // messenger connect to the window
-    // this.messenger.setChatChannel(
-    //   peerToken,
-    //   new WebviewChannel(peerToken, mainWindow.webContents),
-    // );
 
     this.emit("create", mainWindow)
 
