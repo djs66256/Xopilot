@@ -80,6 +80,7 @@ export class BrowserWindowHost extends EventEmitter {
       mainWindow.webContents.openDevTools();
     }
     // mainWindow.webContents.openDevTools();
+
     return mainWindow;
   }
 }
