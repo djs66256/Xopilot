@@ -1,44 +1,23 @@
 import express from "express";
 import http from "node:http";
 import { EventEmitter } from "events";
-import { Server, Socket } from "socket.io";
+import { Server } from "socket.io";
+import { SocketChannel } from "./SocketChannel";
 
 const HOST = "127.0.0.1";
 const PORT = 56567;
 
-export class SocketChannel extends EventEmitter  {
-  constructor(
-    private project: Project,
-    private socket: Socket,
-  ) {
-    super();
-  }
-  onMessage(messageType: string, handler: (data: any) => void): void {
-    throw new Error("Method not implemented.");
-  }
-
-  sendMessage(messageType: string, data: any) {
-    this.socket.emit("message", { messageType, data });
-  }
-
-  async invoke(event: string, data: any) {
-    return await this.socket.emitWithAck(event, data);
-  }
-
-  async request(messageType: string, data: any) {
-    return await this.socket.emitWithAck("message", { messageType, data });
-  }
-
-  disconnect() {
-    this.socket.disconnect();
-  }
-
-  get isConnected() {
-    return this.socket.connected;
-  }
+export type SocketIPCServerEvents = {
+  "connected": SocketChannel,
+  "disconnected": SocketChannel,
 }
 
-export class SocketIPCServer extends EventEmitter implements IPCServer {
+export interface SocketIPCServer {
+  on<T extends keyof SocketIPCServerEvents>(event: T, listener: (channel: SocketIPCServerEvents[T]) => void): this;
+  startServer(): void;
+}
+
+export class SocketIPCServer extends EventEmitter {
   private app = express();
   private server = http.createServer(this.app);
   private io = new Server(this.server, {
