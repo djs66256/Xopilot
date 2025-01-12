@@ -1,28 +1,57 @@
 import EventEmitter from "node:events";
 import { Socket } from "socket.io";
+import { ToXcodeFromCoreProtocol } from "../messages/XcodeTypes";
+import { v4 as uuidv4 } from "uuid"
 
+export type SocketChannelEvents = {
+  "message": {
+    messageType: string;
+    messageId: string;
+    data: any;
+  };
+};
 
-export class SocketChannel extends EventEmitter  {
+export interface SocketChannel {
+  on<T extends keyof SocketChannelEvents>(
+    event: T,
+    listener: (data: SocketChannelEvents[T]) => void,
+  ): this;
+
+  request<T extends keyof ToXcodeFromCoreProtocol>(
+    messageType: T,
+    data: ToXcodeFromCoreProtocol[T][0],
+  ): Promise<ToXcodeFromCoreProtocol[T][1]>;
+}
+
+export class SocketChannel extends EventEmitter implements SocketChannel {
   constructor(
-    private project: Project,
+    readonly project: Project,
     private socket: Socket,
   ) {
     super();
-  }
-  onMessage(messageType: string, handler: (data: any) => void): void {
-    throw new Error("Method not implemented.");
+
+    socket.on("message", (messageType, messageId, data) => {
+      const ack = this.receiveMessage(messageType, messageId, data);
+      if (ack) {
+
+      }
+    });
   }
 
-  sendMessage(messageType: string, data: any) {
-    this.socket.emit("message", { messageType, data });
+  private receiveMessage(messageType: string, messageId: string, data: any): any {
+    this.emit("message", { messageType, messageId, data });
   }
 
-  async invoke(event: string, data: any) {
-    return await this.socket.emitWithAck(event, data);
+  private send(messageType: string, data: any, messageId?: string): Promise<any> {
+    const id = messageId || uuidv4();
+    return this.socket.emitWithAck("message", { messageType, data, messageId: id });
   }
 
-  async request(messageType: string, data: any) {
-    return await this.socket.emitWithAck("message", { messageType, data });
+  request<T extends keyof ToXcodeFromCoreProtocol>(
+    messageType: T,
+    data: ToXcodeFromCoreProtocol[T][0],
+  ): Promise<ToXcodeFromCoreProtocol[T][1]> {
+    return this.send(messageType, data)
   }
 
   disconnect() {

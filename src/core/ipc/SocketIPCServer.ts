@@ -8,12 +8,15 @@ const HOST = "127.0.0.1";
 const PORT = 56567;
 
 export type SocketIPCServerEvents = {
-  "connected": SocketChannel,
-  "disconnected": SocketChannel,
-}
+  "connected": SocketChannel;
+  "disconnected": SocketChannel;
+};
 
 export interface SocketIPCServer {
-  on<T extends keyof SocketIPCServerEvents>(event: T, listener: (channel: SocketIPCServerEvents[T]) => void): this;
+  on<T extends keyof SocketIPCServerEvents>(
+    event: T,
+    listener: (channel: SocketIPCServerEvents[T]) => void,
+  ): this;
   startServer(): void;
 }
 
@@ -35,34 +38,33 @@ export class SocketIPCServer extends EventEmitter {
   }
 
   private setupServer() {
-    return;
     this.io.on("connection", (socket) => {
-      console.debug(`[IPC] a user connected ${socket.id}`);
+      console.debug(`[SIPC] a user connected ${socket.id}`);
       // get the socket identifier
       socket
         .emitWithAck("whoareyou")
         .then((res) => {
-          console.debug("[IPC] whoareyou: " + res);
+          console.debug("[SIPC] whoareyou: " + res);
           const id = res.id as string;
           if (res.type == "inspector" && id) {
             // success connected!
-            const project = {id: "xxx", documentUrl: 'xxx'} as Project;
+            const project: Project = { id: "xxx", documentUrl: "xxx" };
             const channel = new SocketChannel(project, socket);
             this.channels.set(socket.id, channel);
 
             this.emit("connected", channel);
           } else {
-            console.error("[IPC] whoareyou error: " + res);
+            console.error("[SIPC] whoareyou error: " + res);
             socket.disconnect();
           }
         })
         .catch((err) => {
           socket.disconnect();
-          console.error("[IPC] whoareyou error: " + err);
+          console.error("[SIPC] whoareyou error: " + err);
         });
 
       socket.on("disconnect", (reason) => {
-        console.debug("[IPC] socket disconnect: " + reason);
+        console.debug("[SIPC] socket disconnect: " + reason);
         const channel = this.channels.get(socket.id);
         channel.disconnect();
         this.emit("disconnected", channel);
@@ -70,7 +72,7 @@ export class SocketIPCServer extends EventEmitter {
       });
     });
     this.io.engine.on("connection_error", (error) => {
-      console.error("[IPC] socket connection_error: " + error);
+      console.error("[SIPC] socket connection_error: " + error);
     });
   }
 
