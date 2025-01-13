@@ -30,12 +30,21 @@ export class SocketChannel extends EventEmitter implements SocketChannel {
   ) {
     super();
 
-    socket.on("message", (messageType, messageId, data) => {
-      const ack = this.receiveMessage(messageType, messageId, data);
-      if (ack) {
+    socket.onAny((event: string, ...args) => {
+      if (event.startsWith("xcode:")) {
+        console.log(...args)
+        // const ack = this.receiveMessage();
+      // if (ack) {
 
+      // }
       }
     });
+    // socket.on("message", (messageType, messageId, data) => {
+    //   const ack = this.receiveMessage(messageType, messageId, data);
+    //   if (ack) {
+
+    //   }
+    // });
   }
 
   private receiveMessage(messageType: string, messageId: string, data: any): any {
