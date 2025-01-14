@@ -5,6 +5,9 @@ import { InProcessMessenger } from "core/protocol/messenger";
 import { FromCoreProtocol, ToCoreProtocol } from "core/protocol";
 import { BrowserWindowHost } from "./BrowserWindowHost";
 import { IdeChannel } from "../messages/IdeChannel";
+import { Project } from "./types";
+import { XcodeChannel } from "../messages/XcodeChannel";
+import { SocketIPCServer } from "../ipc/SocketIPCServer";
 
 export class ProjectContainer {
   private ide: XcodeIDE;
@@ -18,44 +21,48 @@ export class ProjectContainer {
   >;
 
   private chatWindow: BrowserWindowHost;
+  private xcodeChannel: XcodeChannel;
   private messenger: ProjectMessenger;
   private core: Core;
 
-  constructor(project: Project) {
+  constructor(
+    readonly project: Project,
+    readonly ipcServer: SocketIPCServer,
+  ) {
+    this.xcodeChannel = new XcodeChannel(project, this.ipcServer);
     // this.configHandler = this.core.configHandler;
     // resolveConfigHandler?.(this.configHandler);
     // this.configHandler.loadConfig();
     // try {
-      this.chatWindow = new BrowserWindowHost(project);
-      this.inProcessMessenger = new InProcessMessenger<
-        ToCoreProtocol,
-        FromCoreProtocol
-      >();
-      this.ideChannel = new IdeChannel(project);
-      this.ide = new XcodeIDE();
-      this.messenger = new ProjectMessenger(
-        this.inProcessMessenger,
-        this.chatWindow.messageChannel,
-        this.ideChannel,
-        this.ide
-      )
-      this.core = new Core(
-        this.inProcessMessenger,
-        this.ide,
-        async (log: string) => {
-          // outputChannel.appendLine(
-          //   "==========================================================================",
-          // );
-          // outputChannel.appendLine(
-          //   "==========================================================================",
-          // );
-          // outputChannel.append(log);
-        },
-      );
+    this.chatWindow = new BrowserWindowHost(project);
+    this.inProcessMessenger = new InProcessMessenger<
+      ToCoreProtocol,
+      FromCoreProtocol
+    >();
+    this.ideChannel = new IdeChannel(project);
+    this.ide = new XcodeIDE();
+    this.messenger = new ProjectMessenger(
+      this.inProcessMessenger,
+      this.chatWindow.messageChannel,
+      this.ideChannel,
+      this.ide,
+    );
+    this.core = new Core(
+      this.inProcessMessenger,
+      this.ide,
+      async (log: string) => {
+        // outputChannel.appendLine(
+        //   "==========================================================================",
+        // );
+        // outputChannel.appendLine(
+        //   "==========================================================================",
+        // );
+        // outputChannel.append(log);
+      },
+    );
     // } catch (e) {
     //   console.log("Error creating core", e);
     // }
-
   }
 
   destroy() {

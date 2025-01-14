@@ -5,6 +5,7 @@ import { EventEmitter } from "node:events";
 import { v4 as uuidv4 } from "uuid";
 import { WebviewMessengerResult } from "core/protocol/util";
 import { IMessenger } from "core/protocol/messenger";
+import { Project } from "../project/types";
 
 export class WebviewChannel
   implements IMessenger<FromWebviewProtocol, ToWebviewProtocol>

@@ -3,13 +3,14 @@ import http from "node:http";
 import { EventEmitter } from "events";
 import { Server } from "socket.io";
 import { SocketChannel } from "./SocketChannel";
+import { Project } from "../project/types";
 
 const HOST = "127.0.0.1";
 const PORT = 56567;
 
 export type SocketIPCServerEvents = {
-  "connected": SocketChannel;
-  "disconnected": SocketChannel;
+  connected: SocketChannel;
+  disconnected: SocketChannel;
 };
 
 export interface SocketIPCServer {
@@ -32,7 +33,17 @@ export class SocketIPCServer extends EventEmitter {
   private port = PORT;
   private channels = new Map<string, SocketChannel>();
 
-  constructor() {
+  get inspectorChannel(): SocketChannel | undefined {
+    // find the inspector channel by channel.id == "inspector"
+    for (const channel of this.channels.values()) {
+      if (channel.info.type == "inspector") {
+        return channel;
+      }
+    }
+    return undefined;
+  }
+
+  constructor(readonly projectResolver: (project: Project) => Promise<void>) {
     super();
     this.setupServer();
   }
@@ -44,14 +55,17 @@ export class SocketIPCServer extends EventEmitter {
       socket
         .emitWithAck("whoareyou")
         .then((res) => {
-          let resstr = res.toString('utf-8');
+          let resstr = res.toString("utf-8");
           res = JSON.parse(resstr);
           console.debug("[SIPC] whoareyou: " + res);
           const id = res.id as string;
           if (res.type == "inspector" && id) {
             // success connected!
-            const project: Project = { id: "xxx", documentUrl: "xxx" };
-            const channel = new SocketChannel(project, socket);
+            const channel = new SocketChannel(
+              { id: socket.id, type: res.type },
+              socket,
+              this.projectResolver,
+            );
             this.channels.set(socket.id, channel);
 
             this.emit("connected", channel);

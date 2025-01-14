@@ -1,12 +1,11 @@
+import { SocketIPCServer } from "../ipc/SocketIPCServer";
 import { ProjectContainer } from "./ProjectContainer";
-
+import { Project } from "./types";
 
 export class ProjectManager {
   private projects: Map<string, ProjectContainer> = new Map();
 
-  constructor() {
-    
-  }
+  constructor(readonly ipcServer: SocketIPCServer) {}
 
   destroy() {
     for (const [, project] of this.projects) {
@@ -17,7 +16,7 @@ export class ProjectManager {
   getProjectContainer(project: Project): ProjectContainer {
     let container = this.projects.get(project.id);
     if (!container) {
-      container = new ProjectContainer(project);
+      container = new ProjectContainer(project, this.ipcServer);
       this.projects.set(project.id, container);
     }
     return container;
@@ -26,5 +25,4 @@ export class ProjectManager {
   deleteProjectContainer(project: Project) {
     this.projects.delete(project.id);
   }
-
 }

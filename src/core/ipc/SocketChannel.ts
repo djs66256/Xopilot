@@ -5,6 +5,7 @@ import {
   ToXcodeFromCoreProtocol,
 } from "../messages/XcodeTypes";
 import { v4 as uuidv4 } from "uuid";
+import { Project } from "../project/types";
 
 export type SocketChannelEvents = {
   message: {
@@ -20,15 +21,24 @@ type Response<T> = {
   data: T;
 };
 
+export type SocketChannelType = "inspector" | "extension"
+
+export interface SocketChannelInfo {
+  id: string;
+  type: SocketChannelType;
+}
+
 export interface SocketChannel {
   on<T extends keyof ToCoreFromXcodeProtocol>(
-    messageType: T,
+    project: Project,
     handler: (
+      messageType: T,
       message: ToCoreFromXcodeProtocol[T][0],
     ) => Promise<ToCoreFromXcodeProtocol[T][1]> | ToCoreFromXcodeProtocol[T][1],
   ): this;
 
   request<T extends keyof ToXcodeFromCoreProtocol>(
+    project: Project,
     messageType: T,
     data: ToXcodeFromCoreProtocol[T][0],
   ): Promise<ToXcodeFromCoreProtocol[T][1]>;
@@ -36,32 +46,51 @@ export interface SocketChannel {
 
 export class SocketChannel implements SocketChannel {
   constructor(
-    readonly project: Project,
+    readonly info: SocketChannelInfo,
     private socket: Socket,
+    readonly projectResolver: (project: Project) => Promise<void>,
   ) {
     this.setup();
   }
 
-  private listeners: Map<string, (message: any) => any> = new Map();
+  private projectListeners: Map<
+    Project,
+    (messagetType: string, message: any) => Promise<any> | any
+  > = new Map();
+  // private listeners: Map<string, (project: Project, message: any) => any> =
+  // new Map();
+  // on<T extends keyof ToCoreFromXcodeProtocol>(
+  //   messageType: T,
+  //   handler: (
+  //     project: Project | undefined,
+  //     message: ToCoreFromXcodeProtocol[T][0],
+  //   ) => Promise<ToCoreFromXcodeProtocol[T][1]> | ToCoreFromXcodeProtocol[T][1],
+  // ): this {
+  //   this.listeners.set(messageType, handler);
+  //   return this;
+  // }
+
   on<T extends keyof ToCoreFromXcodeProtocol>(
-    messageType: T,
+    project: Project,
     handler: (
+      messageType: T,
       message: ToCoreFromXcodeProtocol[T][0],
     ) => Promise<ToCoreFromXcodeProtocol[T][1]> | ToCoreFromXcodeProtocol[T][1],
   ): this {
-    this.listeners.set(messageType, handler);
+    this.projectListeners.set(project, handler);
     return this;
   }
 
   request<T extends keyof ToXcodeFromCoreProtocol>(
+    project: Project | undefined = undefined,
     messageType: T,
     data: ToXcodeFromCoreProtocol[T][0],
   ): Promise<ToXcodeFromCoreProtocol[T][1]> {
     return new Promise((resolve, reject) => {
       this.socket.emitWithAck(
         this.encodeEvent(messageType),
-        data,
-        (data) => {
+        { project, message: data },
+        (data: any) => {
           const responseJson = this.decode(data);
           if (responseJson.code !== 0) {
             reject(responseJson);
@@ -127,33 +156,42 @@ export class SocketChannel implements SocketChannel {
         ack(data);
       };
 
-      let [success, messageType] = this.decodeEvent(event);
+      const [success, messageType] = this.decodeEvent(event);
       if (!success) {
         console.error("[SIPC] invalid event: " + event);
         error({ code: -1, error: "invalid event" });
         return;
       }
 
-      const listener = this.listeners.get(messageType);
-      if (!listener) {
-        console.error("[SIPC] no listener for " + messageType);
-        error({ code: -1, error: "no listener" });
-        return;
-      }
+      const str = data.toString("utf-8");
+      const json = JSON.parse(str);
+      const project = json.project;
+      const message = json.message;
 
-      let str = data.toString("utf-8");
-      let json = JSON.parse(str);
+      this.projectResolver(project)
+        .then(() => {
+          const listener = this.projectListeners.get(project);
+          if (!listener) {
+            console.error("[SIPC] no listener for " + messageType);
+            error({ code: -1, error: "no listener" });
+            return;
+          }
 
-      try {
-        const ret = listener(json);
-        if (ret instanceof Promise) {
-          ret.then((res) => response(res)).catch((e) => error(e));
-        } else {
-          response(ret);
-        }
-      } catch (e) {
-        error(e);
-      }
+          try {
+            const ret = listener(project, message);
+            if (ret instanceof Promise) {
+              ret.then((res) => response(res)).catch((e) => error(e));
+            } else {
+              response(ret);
+            }
+          } catch (e) {
+            error(e);
+          }
+        })
+        .catch((e) => {
+          console.error("[SIPC] failed to resolve project: " + project);
+          error(e);
+        });
     });
   }
 
