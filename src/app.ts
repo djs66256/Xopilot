@@ -11,6 +11,7 @@ export class App {
   }
 
   onReady() {
+    this.ipcServer.startServer();
     this.ipcServer.on("connected", (channel) => {
       const project = this.projectManager.getProjectContainer(channel.project)
       project.insepectChannel = channel;

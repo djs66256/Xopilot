@@ -44,6 +44,8 @@ export class SocketIPCServer extends EventEmitter {
       socket
         .emitWithAck("whoareyou")
         .then((res) => {
+          let resstr = res.toString('utf-8');
+          res = JSON.parse(resstr);
           console.debug("[SIPC] whoareyou: " + res);
           const id = res.id as string;
           if (res.type == "inspector" && id) {
