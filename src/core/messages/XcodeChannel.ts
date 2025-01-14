@@ -1,7 +1,9 @@
+import { InProcessMessenger } from "core/protocol/messenger";
 import { SocketChannel } from "../ipc/SocketChannel";
 import { SocketIPCServer } from "../ipc/SocketIPCServer";
 import { Project } from "../project/types";
 import { ToCoreFromXcodeProtocol, ToXcodeFromCoreProtocol } from "./XcodeTypes";
+import { FromCoreProtocol, ToCoreProtocol } from "core/protocol";
 
 export interface XcodeChannel {
   on<T extends keyof ToCoreFromXcodeProtocol>(
@@ -22,6 +24,10 @@ export class XcodeChannel implements XcodeChannel {
   constructor(
     private readonly project: Project,
     private readonly ipcServer: SocketIPCServer,
+    private readonly inProcessMessenger: InProcessMessenger<
+        ToCoreProtocol,
+        FromCoreProtocol
+      >
   ) {
     this.socketChannel = ipcServer.inspectorChannel
     this.ipcServer.on("connected", (channel) => {
@@ -44,10 +50,12 @@ export class XcodeChannel implements XcodeChannel {
       return;
     }
     this.socketChannel.on(this.project, (messageType, message) => {
-      const handler = this.listeners.get(messageType);
-      if (handler) {
-        return handler(message);
-      }
+      return this.inProcessMessenger.externalRequest(messageType, message);
+
+      // const handler = this.listeners.get(messageType);
+      // if (handler) {
+      //   return handler(message);
+      // }
     });
   }
 
