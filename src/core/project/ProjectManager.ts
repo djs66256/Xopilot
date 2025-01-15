@@ -1,6 +1,6 @@
 import { SocketIPCServer } from "../ipc/SocketIPCServer";
 import { ProjectContainer } from "./ProjectContainer";
-import { Project } from "./types";
+import { Project, projectIdentifier } from "./types";
 
 export class ProjectManager {
   private projects: Map<string, ProjectContainer> = new Map();
@@ -14,7 +14,7 @@ export class ProjectManager {
   }
 
   getProjectContainer(project: Project): ProjectContainer {
-    let container = this.projects.get(project.id);
+    let container = this.projects.get(projectIdentifier(project));
     if (!container) {
       container = new ProjectContainer(project, this.ipcServer);
       this.projects.set(project.id, container);

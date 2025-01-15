@@ -5,7 +5,7 @@ import {
   ToXcodeFromCoreProtocol,
 } from "../messages/XcodeTypes";
 import { v4 as uuidv4 } from "uuid";
-import { Project } from "../project/types";
+import { Project, projectIdentifier } from "../project/types";
 
 export type SocketChannelEvents = {
   message: {
@@ -32,7 +32,7 @@ export interface SocketChannel {
   on<T extends keyof ToCoreFromXcodeProtocol>(
     project: Project,
     handler: (
-      messageType: T,
+      messageType: keyof ToCoreFromXcodeProtocol,
       message: ToCoreFromXcodeProtocol[T][0],
     ) => Promise<ToCoreFromXcodeProtocol[T][1]> | ToCoreFromXcodeProtocol[T][1],
   ): this;
@@ -77,7 +77,7 @@ export class SocketChannel implements SocketChannel {
       message: ToCoreFromXcodeProtocol[T][0],
     ) => Promise<ToCoreFromXcodeProtocol[T][1]> | ToCoreFromXcodeProtocol[T][1],
   ): this {
-    this.projectListeners.set(this.mapKey(project), handler);
+    this.projectListeners.set(projectIdentifier(project), handler);
     return this;
   }
 
@@ -100,10 +100,6 @@ export class SocketChannel implements SocketChannel {
         },
       );
     });
-  }
-
-  private mapKey(project: Project) {
-    return `${project.id}:${project.documentUrl}`;
   }
 
   private encodeEvent(messageType: string) {
@@ -175,7 +171,7 @@ export class SocketChannel implements SocketChannel {
 
       this.projectResolver(project)
         .then(() => {
-          const listener = this.projectListeners.get(this.mapKey(project));
+          const listener = this.projectListeners.get(projectIdentifier(project));
           // console.log(this, this.projectListeners, listener)
           if (!listener) {
             console.error("[SIPC] no listener for " + JSON.stringify(project));

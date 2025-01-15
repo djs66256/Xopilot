@@ -2,11 +2,12 @@ import { AutocompleteInput, AutocompleteOutcome } from "core/autocomplete/util/t
 
 
 export type ToCoreFromXcodeProtocol = {
-  "autocomplete/request": [AutocompleteInput, AutocompleteOutcome],
-  "autocomplete/reject": [string, void],
-  "autocomplete/accept": [string, void]
+  "autocomplete/complete": [AutocompleteInput, string[]];
+  "autocomplete/request": [AutocompleteInput, AutocompleteOutcome];
+  "autocomplete/reject": [string, void];
+  "autocomplete/accept": [string, void];
 }
 
 export type ToXcodeFromCoreProtocol = {
-  "autocomplete/suggestions": [AutocompleteOutcome, void]
+  "autocomplete/suggestions": [AutocompleteOutcome, void];
 }

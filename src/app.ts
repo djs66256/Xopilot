@@ -10,7 +10,7 @@ export class App {
     this.ipcServer = new SocketIPCServer((project) => {
       return new Promise((resolve) => {
         const prj = this.projectManager.getProjectContainer(project);
-        prj.openChatBrowserWindow();
+        // prj.openChatBrowserWindow();
         resolve();
       });
     });

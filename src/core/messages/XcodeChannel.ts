@@ -50,7 +50,8 @@ export class XcodeChannel implements XcodeChannel {
       return;
     }
     this.socketChannel.on(this.project, (messageType, message) => {
-      return this.inProcessMessenger.externalRequest(messageType, message);
+      // Just pass the message through to the in-process messenger
+      return this.inProcessMessenger.externalRequest(messageType as any, message as any);
 
       // const handler = this.listeners.get(messageType);
       // if (handler) {
