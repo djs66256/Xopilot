@@ -167,7 +167,7 @@ export class SocketChannel implements SocketChannel {
       const json = JSON.parse(str);
       const project: Project = json.project;
       const message = json.message;
-      console.debug(`[SIPC] received: (${messageType}) str`);
+      console.debug(`[SIPC] received: (${messageType}) ${str}`);
 
       this.projectResolver(project)
         .then(() => {

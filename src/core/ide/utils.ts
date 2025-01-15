@@ -1,6 +1,7 @@
 import path from "node:path";
 import os from "node:os";
 import fs from "node:fs";
+import { fileURLToPath } from "node:url";
 import clipboard from "clipboardy";
 import type { FileStatsMap, FileType } from "core";
 
@@ -18,9 +19,10 @@ export async function fileExists(fileUri: string): Promise<boolean> {
 }
 
 export async function readFile(fileUri: string): Promise<string> {
+  const filepath = fileURLToPath(fileUri);
   return new Promise((resolve, reject) => {
     fs.readFile(
-      fileUri,
+      filepath,
       {
         encoding: "utf8",
       },
