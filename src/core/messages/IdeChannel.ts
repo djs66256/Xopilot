@@ -2,6 +2,7 @@ import EventEmitter from "node:events";
 import { v4 as uuidv4 } from "uuid";
 import { FromIdeProtocol, ToIdeProtocol } from "core/protocol";
 import { Message } from "core/protocol/messenger";
+import { Project } from "../project/types";
 
 export class IdeChannel extends EventEmitter implements IdeChannel {
 

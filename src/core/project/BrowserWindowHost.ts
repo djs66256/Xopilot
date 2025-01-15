@@ -2,6 +2,7 @@ import { BrowserWindow } from "electron";
 import EventEmitter from "node:events";
 import path from "node:path";
 import { WebviewChannel } from "../messages/WebviewChannel";
+import { Project } from "./types";
 
 declare const MAIN_WINDOW_VITE_DEV_SERVER_URL: string;
 declare const MAIN_WINDOW_VITE_NAME: string;

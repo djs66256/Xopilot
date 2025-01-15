@@ -54,7 +54,7 @@ export class SocketChannel implements SocketChannel {
   }
 
   private projectListeners: Map<
-    Project,
+    string,
     (messagetType: string, message: any) => Promise<any> | any
   > = new Map();
   // private listeners: Map<string, (project: Project, message: any) => any> =
@@ -77,7 +77,7 @@ export class SocketChannel implements SocketChannel {
       message: ToCoreFromXcodeProtocol[T][0],
     ) => Promise<ToCoreFromXcodeProtocol[T][1]> | ToCoreFromXcodeProtocol[T][1],
   ): this {
-    this.projectListeners.set(project, handler);
+    this.projectListeners.set(this.mapKey(project), handler);
     return this;
   }
 
@@ -100,6 +100,10 @@ export class SocketChannel implements SocketChannel {
         },
       );
     });
+  }
+
+  private mapKey(project: Project) {
+    return `${project.id}:${project.documentUrl}`;
   }
 
   private encodeEvent(messageType: string) {
@@ -165,20 +169,22 @@ export class SocketChannel implements SocketChannel {
 
       const str = data.toString("utf-8");
       const json = JSON.parse(str);
-      const project = json.project;
+      const project: Project = json.project;
       const message = json.message;
+      console.debug(`[SIPC] received: (${messageType}) str`);
 
       this.projectResolver(project)
         .then(() => {
-          const listener = this.projectListeners.get(project);
+          const listener = this.projectListeners.get(this.mapKey(project));
+          // console.log(this, this.projectListeners, listener)
           if (!listener) {
-            console.error("[SIPC] no listener for " + messageType);
+            console.error("[SIPC] no listener for " + JSON.stringify(project));
             error({ code: -1, error: "no listener" });
             return;
           }
 
           try {
-            const ret = listener(project, message);
+            const ret = listener(messageType, message);
             if (ret instanceof Promise) {
               ret.then((res) => response(res)).catch((e) => error(e));
             } else {

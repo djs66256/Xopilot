@@ -29,7 +29,6 @@ export class ProjectContainer {
     readonly project: Project,
     readonly ipcServer: SocketIPCServer,
   ) {
-    this.xcodeChannel = new XcodeChannel(project, this.ipcServer);
     // this.configHandler = this.core.configHandler;
     // resolveConfigHandler?.(this.configHandler);
     // this.configHandler.loadConfig();
@@ -39,6 +38,11 @@ export class ProjectContainer {
       ToCoreProtocol,
       FromCoreProtocol
     >();
+    this.xcodeChannel = new XcodeChannel(
+      project,
+      this.ipcServer,
+      this.inProcessMessenger,
+    );
     this.ideChannel = new IdeChannel(project);
     this.ide = new XcodeIDE();
     this.messenger = new ProjectMessenger(
