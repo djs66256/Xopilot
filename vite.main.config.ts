@@ -22,6 +22,8 @@ export default defineConfig({
         "vectordb",
         "pg",
         "jsdom",
+        "tree-sitter-wasms",
+        "web-tree-sitter"
       //   "onnxruntime",
         // /node_modules\/[^sa]/
       ],
