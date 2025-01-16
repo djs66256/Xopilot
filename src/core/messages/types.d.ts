@@ -1,4 +1,4 @@
-import { FromIdeProtocol, ToIdeProtocol } from "continue/core/protocol";
+import { FromIdeProtocol, ToIdeProtocol } from "core/protocol";
 
 
 interface WebviewChannel implements IMessenger<FromWebviewProtocol, ToWebviewProtocol> {

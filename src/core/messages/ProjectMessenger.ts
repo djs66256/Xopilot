@@ -9,8 +9,8 @@ import {
   CORE_TO_WEBVIEW_PASS_THROUGH,
   WEBVIEW_TO_CORE_PASS_THROUGH,
 } from "core/protocol/passThrough";
-import { ToIdeFromCoreProtocol } from "continue/core/protocol/ideCore";
-import { ToIdeFromWebviewOrCoreProtocol } from "continue/core/protocol/ide";
+import { ToIdeFromCoreProtocol } from "core/protocol/ideCore";
+import { ToIdeFromWebviewOrCoreProtocol } from "core/protocol/ide";
 import { XcodeIDE } from "../ide/XcodeIDE";
 import { WebviewChannel } from "./WebviewChannel";
 import { IdeChannel } from "./IdeChannel";
