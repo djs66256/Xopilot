@@ -6,7 +6,7 @@ import { ConfigHandler } from "core/config/ConfigHandler";
 import { Project } from "../project/types";
 
 
-class XcodeCompletionMessenger {
+export class CompletionMessenger {
   private readonly completionProvider: XcodeCompletionProvider
   
   constructor(

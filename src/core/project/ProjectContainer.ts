@@ -8,10 +8,14 @@ import { IdeChannel } from "../messages/IdeChannel";
 import { Project } from "./types";
 import { XcodeChannel } from "../messages/XcodeChannel";
 import { SocketIPCServer } from "../ipc/SocketIPCServer";
+import { CompletionMessenger } from "../autocomplete/CompletionMessenger";
+import { TabAutocompleteModel } from "../autocomplete/loadAutocompleteModel";
+import { ConfigHandler } from "core/config/ConfigHandler";
 
 export class ProjectContainer {
   private ide: XcodeIDE;
 
+  private configHandler: ConfigHandler;
   private _insepectChannel: MessageChannel | null = null;
   private _chatChannel: MessageChannel | null = null;
   private ideChannel: IdeChannel;
@@ -19,6 +23,7 @@ export class ProjectContainer {
     ToCoreProtocol,
     FromCoreProtocol
   >;
+  private tabAutocompleteModel: TabAutocompleteModel;
 
   private chatWindow: BrowserWindowHost;
   private xcodeChannel: XcodeChannel;
@@ -63,6 +68,15 @@ export class ProjectContainer {
         // );
         // outputChannel.append(log);
       },
+    );
+    this.configHandler = this.core.configHandler;
+    this.tabAutocompleteModel = new TabAutocompleteModel(this.configHandler);
+    new CompletionMessenger(
+      this.project,
+      this.configHandler,
+      this.ide,
+      this.tabAutocompleteModel,
+      this.xcodeChannel,
     );
     // } catch (e) {
     //   console.log("Error creating core", e);

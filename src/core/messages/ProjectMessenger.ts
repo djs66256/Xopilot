@@ -60,7 +60,6 @@ export class ProjectMessenger {
     private readonly webviewChannel: WebviewChannel,
     private readonly ideChannel: IdeChannel | undefined,
     private readonly ide: XcodeIDE,
-    private readonly completionProvider: XcodeCompletionProvider,
   ) {
     /** WEBVIEW ONLY LISTENERS **/
     this.onWebview("showFile", (msg) => {
