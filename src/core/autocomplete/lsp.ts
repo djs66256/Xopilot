@@ -5,7 +5,6 @@ import {
   FUNCTION_DECLARATION_NODE_TYPEs,
 } from "core/indexing/chunk/code";
 import { intersection } from "core/util/ranges";
-import * as vscode from "vscode";
 
 import type { IDE, Range, RangeInFile, RangeInFileWithContents } from "core";
 import type Parser from "web-tree-sitter";
@@ -24,7 +23,7 @@ type GotoProviderName =
   | "vscode.executeReferenceProvider";
 
 interface GotoInput {
-  uri: vscode.Uri;
+  uri: string;
   line: number;
   character: number;
   name: GotoProviderName;
@@ -154,7 +153,7 @@ async function crawlTypes(
   const definitions = await Promise.all(
     identifierNodes.map(async (node) => {
       const [typeDef] = await executeGotoProvider({
-        uri: vscode.Uri.parse(rif.filepath),
+        uri: rif.filepath,
         // TODO: tree-sitter is zero-indexed, but there seems to be an off-by-one
         // error at least with the .ts parser sometimes
         line:
@@ -202,7 +201,7 @@ async function crawlTypes(
 }
 
 export async function getDefinitionsForNode(
-  uri: vscode.Uri,
+  uri: string,
   node: Parser.SyntaxNode,
   ide: IDE,
   lang: AutocompleteLanguageInfo,
@@ -360,7 +359,7 @@ export const getDefinitionsFromLsp: GetLspDefinitionsFunction = async (
     const results: RangeInFileWithContents[] = [];
     for (const node of treePath.reverse()) {
       const definitions = await getDefinitionsForNode(
-        vscode.Uri.parse(filepath),
+        filepath,
         node,
         ide,
         lang,

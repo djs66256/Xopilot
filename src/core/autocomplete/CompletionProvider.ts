@@ -1,34 +1,33 @@
-import { BracketMatchingService } from "core/autocomplete/filtering/BracketMatchingService";
-import { IDE } from "core";
-import AutocompleteLruCache from "core/autocomplete/util/AutocompleteLruCache";
-import { AutocompleteDebouncer } from "core/autocomplete/util/AutocompleteDebouncer";
-import { CompletionStreamer } from "core/autocomplete/generation/CompletionStreamer";
-import { ContextRetrievalService } from "core/autocomplete/context/ContextRetrievalService";
-import { AutocompleteLoggingService } from "core/autocomplete/util/AutocompleteLoggingService";
-import { XcodeChannel } from "../messages/XcodeChannel";
+import { IDE, Position, Range } from "core";
 import { ConfigHandler } from "core/config/ConfigHandler";
+import { AutocompleteInput, AutocompleteOutcome } from "core/autocomplete/util/types";
+import { CompletionProvider } from "core/autocomplete/CompletionProvider";
+import { Project } from "../project/types";
 import { TabAutocompleteModel } from "./loadAutocompleteModel";
 import { getDefinitionsFromLsp } from "./lsp";
-import { AutocompleteInput, AutocompleteOutcome } from "core/autocomplete/util/types";
-import { Project } from "../project/types";
-import Diff from "diff";
+import { RecentlyEditedTracker } from "./recentlyEdited";
+import { XcodeChannel } from "../messages/XcodeChannel";
+import { v4 as uuidv4 } from "uuid";
+import Diff, { Change } from "diff";
 
-interface DiffType {
-  count: number;
-  added: boolean;
-  removed: boolean;
-  value: string;
-}
+// interface DiffType {
+//   count: number;
+//   added: boolean;
+//   removed: boolean;
+//   value: string;
+// }
 
-class CompletionProvider {
-  private autocompleteCache = AutocompleteLruCache.get();
+class XcodeCompletionProvider {
+  // private autocompleteCache = AutocompleteLruCache.get();
   public errorsShown: Set<string> = new Set();
-  private bracketMatchingService = new BracketMatchingService();
-  private debouncer = new AutocompleteDebouncer();
-  private completionStreamer: CompletionStreamer;
-  private loggingService = new AutocompleteLoggingService();
-  private contextRetrievalService: ContextRetrievalService;
+  // private bracketMatchingService = new BracketMatchingService();
+  // private debouncer = new AutocompleteDebouncer();
+  // private completionStreamer: CompletionStreamer;
+  // private loggingService = new AutocompleteLoggingService();
+  // private contextRetrievalService: ContextRetrievalService;
   private completionProvider: CompletionProvider;
+  private recentlyEditedTracker = new RecentlyEditedTracker();
+  _lastShownCompletion: AutocompleteOutcome | undefined;
 
   constructor(
     private readonly project: Project,
@@ -44,8 +43,8 @@ class CompletionProvider {
       this.onError.bind(this),
       getDefinitionsFromLsp,
     );
-    this.completionStreamer = new CompletionStreamer(this.onError.bind(this));
-    this.contextRetrievalService = new ContextRetrievalService(this.ide);
+    // this.completionStreamer = new CompletionStreamer(this.onError.bind(this));
+    // this.contextRetrievalService = new ContextRetrievalService(this.ide);
   }
 
   private onError(e: any) {
@@ -75,37 +74,37 @@ class CompletionProvider {
         character: position.character,
       };
       let manuallyPassFileContents: string | undefined = undefined;
-      if (document.uri.scheme === "vscode-notebook-cell") {
-        const notebook = vscode.workspace.notebookDocuments.find((notebook) =>
-          notebook
-            .getCells()
-            .some((cell) =>
-              URI.equal(cell.document.uri.toString(), document.uri.toString()),
-            ),
-        );
-        if (notebook) {
-          const cells = notebook.getCells();
-          manuallyPassFileContents = cells
-            .map((cell) => {
-              const text = cell.document.getText();
-              if (cell.kind === vscode.NotebookCellKind.Markup) {
-                return `"""${text}"""`;
-              } else {
-                return text;
-              }
-            })
-            .join("\n\n");
-          for (const cell of cells) {
-            if (
-              URI.equal(cell.document.uri.toString(), document.uri.toString())
-            ) {
-              break;
-            } else {
-              pos.line += cell.document.getText().split("\n").length + 1;
-            }
-          }
-        }
-      }
+      // if (document.uri.scheme === "vscode-notebook-cell") {
+      //   const notebook = vscode.workspace.notebookDocuments.find((notebook) =>
+      //     notebook
+      //       .getCells()
+      //       .some((cell) =>
+      //         URI.equal(cell.document.uri.toString(), document.uri.toString()),
+      //       ),
+      //   );
+      //   if (notebook) {
+      //     const cells = notebook.getCells();
+      //     manuallyPassFileContents = cells
+      //       .map((cell) => {
+      //         const text = cell.document.getText();
+      //         if (cell.kind === vscode.NotebookCellKind.Markup) {
+      //           return `"""${text}"""`;
+      //         } else {
+      //           return text;
+      //         }
+      //       })
+      //       .join("\n\n");
+      //     for (const cell of cells) {
+      //       if (
+      //         URI.equal(cell.document.uri.toString(), document.uri.toString())
+      //       ) {
+      //         break;
+      //       } else {
+      //         pos.line += cell.document.getText().split("\n").length + 1;
+      //       }
+      //     }
+      //   }
+      // }
 
       // Manually pass file contents for unsaved, untitled files
       if (document.isUntitled) {
@@ -156,15 +155,15 @@ class CompletionProvider {
       if (selectedCompletionInfo) {
         outcome.completion = selectedCompletionInfo.text + outcome.completion;
       }
-      const willDisplay = this.willDisplay(
-        document,
-        selectedCompletionInfo,
-        signal,
-        outcome,
-      );
-      if (!willDisplay) {
-        return null;
-      }
+      // const willDisplay = this.willDisplay(
+      //   document,
+      //   selectedCompletionInfo,
+      //   signal,
+      //   outcome,
+      // );
+      // if (!willDisplay) {
+      //   return null;
+      // }
 
       // Mark displayed
       this.completionProvider.markDisplayed(input.completionId, outcome);
@@ -172,7 +171,10 @@ class CompletionProvider {
 
       // Construct the range/text to show
       const startPos = selectedCompletionInfo?.range.start ?? position;
-      let range = new vscode.Range(startPos, startPos);
+      let range: Range = {
+        start: startPos,
+        end: startPos,
+      };
       let completionText = outcome.completion;
       const isSingleLineCompletion = outcome.completion.split("\n").length <= 1;
 
@@ -181,7 +183,7 @@ class CompletionProvider {
         const currentText = document
           .lineAt(startPos)
           .text.substring(startPos.character);
-        const diffs: DiffType[] = Diff.diffWords(
+        const diffs = Diff.diffWords(
           currentText,
           lastLineOfCompletionText,
         );
@@ -193,10 +195,10 @@ class CompletionProvider {
           diffPatternMatches(diffs, ["+", "=", "+"])
         ) {
           // The model repeated the text after the cursor to the end of the line
-          range = new vscode.Range(
-            startPos,
-            document.lineAt(startPos).range.end,
-          );
+          range = {
+            start: startPos,
+            end: document.lineAt(startPos).range.end,
+          };
         } else if (
           diffPatternMatches(diffs, ["+", "-"]) ||
           diffPatternMatches(diffs, ["-", "+"])
@@ -227,7 +229,10 @@ class CompletionProvider {
         }
       } else {
         // Extend the range to the end of the line for multiline completions
-        range = new vscode.Range(startPos, document.lineAt(startPos).range.end);
+        range = {
+          start: startPos,
+          end: document.lineAt(startPos).range.end,
+        };
       }
 
       const completionItem = new vscode.InlineCompletionItem(
@@ -252,7 +257,7 @@ type DiffPartType = "+" | "-" | "=";
 
 
 function diffPatternMatches(
-  diffs: DiffType[],
+  diffs: Change[],
   pattern: DiffPartType[],
 ): boolean {
   if (diffs.length !== pattern.length) {
