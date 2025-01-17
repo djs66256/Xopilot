@@ -17,7 +17,7 @@ import Diff, { Change } from "diff";
 //   value: string;
 // }
 
-class XcodeCompletionProvider {
+export class XcodeCompletionProvider {
   // private autocompleteCache = AutocompleteLruCache.get();
   public errorsShown: Set<string> = new Set();
   // private bracketMatchingService = new BracketMatchingService();

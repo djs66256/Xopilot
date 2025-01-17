@@ -14,6 +14,7 @@ import { ToIdeFromWebviewOrCoreProtocol } from "core/protocol/ide";
 import { XcodeIDE } from "../ide/XcodeIDE";
 import { WebviewChannel } from "./WebviewChannel";
 import { IdeChannel } from "./IdeChannel";
+import { XcodeCompletionProvider } from "../autocomplete/CompletionProvider";
 
 type ToIdeOrWebviewFromCoreProtocol = ToIdeFromCoreProtocol &
   ToWebviewFromCoreProtocol;
@@ -59,6 +60,7 @@ export class ProjectMessenger {
     private readonly webviewChannel: WebviewChannel,
     private readonly ideChannel: IdeChannel | undefined,
     private readonly ide: XcodeIDE,
+    private readonly completionProvider: XcodeCompletionProvider,
   ) {
     /** WEBVIEW ONLY LISTENERS **/
     this.onWebview("showFile", (msg) => {
