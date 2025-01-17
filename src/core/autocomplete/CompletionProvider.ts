@@ -1,6 +1,9 @@
 import { IDE, Position, Range } from "core";
 import { ConfigHandler } from "core/config/ConfigHandler";
-import { AutocompleteInput, AutocompleteOutcome } from "core/autocomplete/util/types";
+import {
+  AutocompleteInput,
+  AutocompleteOutcome,
+} from "core/autocomplete/util/types";
 import { CompletionProvider } from "core/autocomplete/CompletionProvider";
 import { Project } from "../project/types";
 import { TabAutocompleteModel } from "./loadAutocompleteModel";
@@ -9,6 +12,8 @@ import { RecentlyEditedTracker } from "./recentlyEdited";
 import { XcodeChannel } from "../messages/XcodeChannel";
 import { v4 as uuidv4 } from "uuid";
 import Diff, { Change } from "diff";
+import { DocumentImpl } from "./Document";
+import { AutocompleteOutput } from "./types";
 
 // interface DiffType {
 //   count: number;
@@ -54,25 +59,22 @@ export class XcodeCompletionProvider {
   public async provideInlineCompletionItems(
     input: AutocompleteInput,
     token: AbortSignal | undefined,
-  ): Promise<AutocompleteOutcome | undefined> {
-    const {
-      // document,
-      pos,
-      selectedCompletionInfo,
-      injectDetails,
-    } = input;
+  ): Promise<AutocompleteOutput | undefined> {
+    const { filepath, pos, selectedCompletionInfo, injectDetails } = input;
     const position = pos;
     try {
       const abortController = new AbortController();
       const signal = abortController.signal;
-      const document = await this.ide.getDocument();
-      token.onCancellationRequested(() => abortController.abort());
+      const document = new DocumentImpl(this.ide, filepath);
+      await document.prepare();
+
+      // token.onCancellationRequested(() => abortController.abort());
 
       // Handle notebook cells
-      const pos = {
-        line: position.line,
-        character: position.character,
-      };
+      // const pos = {
+      //   line: position.line,
+      //   character: position.character,
+      // };
       let manuallyPassFileContents: string | undefined = undefined;
       // if (document.uri.scheme === "vscode-notebook-cell") {
       //   const notebook = vscode.workspace.notebookDocuments.find((notebook) =>
@@ -183,10 +185,7 @@ export class XcodeCompletionProvider {
         const currentText = document
           .lineAt(startPos)
           .text.substring(startPos.character);
-        const diffs = Diff.diffWords(
-          currentText,
-          lastLineOfCompletionText,
-        );
+        const diffs = Diff.diffWords(currentText, lastLineOfCompletionText);
 
         if (diffPatternMatches(diffs, ["+"])) {
           // Just insert, we're already at the end of the line
@@ -235,31 +234,34 @@ export class XcodeCompletionProvider {
         };
       }
 
-      const completionItem = new vscode.InlineCompletionItem(
-        completionText,
-        range,
-        {
-          title: "Log Autocomplete Outcome",
-          command: "continue.logAutocompleteOutcome",
-          arguments: [input.completionId, this.completionProvider],
-        },
-      );
+      return {
+        id: input.completionId,
+        text: completionText,
+        position: startPos,
+        range: range,
+        replacingLines: [],
+      };
 
-      (completionItem as any).completeBracketPairs = true;
-      return [completionItem];
+      // const completionItem = new vscode.InlineCompletionItem(
+      //   completionText,
+      //   range,
+      //   {
+      //     title: "Log Autocomplete Outcome",
+      //     command: "continue.logAutocompleteOutcome",
+      //     arguments: [input.completionId, this.completionProvider],
+      //   },
+      // );
+
+      // (completionItem as any).completeBracketPairs = true;
+      // return [completionItem];
     } finally {
-      
     }
   }
 }
 
 type DiffPartType = "+" | "-" | "=";
 
-
-function diffPatternMatches(
-  diffs: Change[],
-  pattern: DiffPartType[],
-): boolean {
+function diffPatternMatches(diffs: Change[], pattern: DiffPartType[]): boolean {
   if (diffs.length !== pattern.length) {
     return false;
   }

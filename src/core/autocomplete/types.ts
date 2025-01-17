@@ -1,4 +1,4 @@
-import { Position } from "core";
+import { Position, Range } from "core";
 
 export enum EndOfLine {
   /**
@@ -203,4 +203,12 @@ export interface Document {
    * @return The given position or a new, adjusted position.
    */
   validatePosition(position: Position): Position;
+}
+
+export interface AutocompleteOutput {
+  id: string;
+  text: string;
+  position: Position;
+  range: Range;
+  replacingLines: string[];
 }
