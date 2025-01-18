@@ -11,7 +11,7 @@ import { getDefinitionsFromLsp } from "./lsp";
 import { RecentlyEditedTracker } from "./recentlyEdited";
 import { XcodeChannel } from "../messages/XcodeChannel";
 import { v4 as uuidv4 } from "uuid";
-import Diff, { Change } from "diff";
+import { Diff, Change } from "diff";
 import { DocumentImpl } from "./Document";
 import { AutocompleteOutput } from "./types";
 

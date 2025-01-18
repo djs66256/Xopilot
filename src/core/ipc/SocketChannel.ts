@@ -187,11 +187,12 @@ export class SocketChannel implements SocketChannel {
               response(ret);
             }
           } catch (e) {
+            console.error("[SIPC] error in listener: " + e.toString());
             error(e);
           }
         })
         .catch((e) => {
-          console.error("[SIPC] failed to resolve project: " + project);
+          console.error("[SIPC] failed to resolve project: " + JSON.stringify(project));
           error(e);
         });
     });
