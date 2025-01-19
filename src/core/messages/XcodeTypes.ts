@@ -4,7 +4,7 @@ import { AutocompleteOutput } from "../autocomplete/types";
 
 export type ToCoreFromXcodeProtocol = {
   "autocomplete/complete": [AutocompleteInput, AutocompleteOutput];
-  "autocomplete/request": [AutocompleteInput, AutocompleteOutcome];
+  "autocomplete/getSuggestion": [AutocompleteInput, AutocompleteOutput];
   "autocomplete/reject": [string, void];
   "autocomplete/accept": [string, void];
 }

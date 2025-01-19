@@ -24,7 +24,7 @@ export class CompletionMessenger {
       this.tabAutocompleteModel,
     );
 
-    inspectorChannel.on("autocomplete/complete", async (data) => {
+    inspectorChannel.on("autocomplete/getSuggestion", async (data) => {
       return await this.completionProvider.provideInlineCompletionItems(data, undefined)
     })
   }

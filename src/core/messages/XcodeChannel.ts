@@ -25,11 +25,11 @@ export class XcodeChannel implements XcodeChannel {
     private readonly project: Project,
     private readonly ipcServer: SocketIPCServer,
     private readonly inProcessMessenger: InProcessMessenger<
-        ToCoreProtocol,
-        FromCoreProtocol
-      >
+      ToCoreProtocol,
+      FromCoreProtocol
+    >,
   ) {
-    this.socketChannel = ipcServer.inspectorChannel
+    this.socketChannel = ipcServer.inspectorChannel;
     this.ipcServer.on("connected", (channel) => {
       if (channel.info.type == "inspector") {
         this.socketChannel = channel;
@@ -50,13 +50,16 @@ export class XcodeChannel implements XcodeChannel {
       return;
     }
     this.socketChannel.on(this.project, (messageType, message) => {
-      // Just pass the message through to the in-process messenger
-      return this.inProcessMessenger.externalRequest(messageType as any, message as any);
-
-      // const handler = this.listeners.get(messageType);
-      // if (handler) {
-      //   return handler(message);
-      // }
+      const handler = this.listeners.get(messageType);
+      if (handler) {
+        return handler(message);
+      } else {
+        // Just pass the message through to the in-process messenger
+        return this.inProcessMessenger.externalRequest(
+          messageType as any,
+          message as any,
+        );
+      }
     });
   }
 

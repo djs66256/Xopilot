@@ -151,6 +151,7 @@ export class SocketChannel implements SocketChannel {
       };
 
       const response = (ret: any) => {
+        console.debug(`[SIPC] sent: (${messageType}) ${JSON.stringify(ret)}`);
         const message = this.successResponse(ret);
         const data = this.encode(message);
         ack(data);
