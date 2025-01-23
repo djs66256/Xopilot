@@ -14,6 +14,7 @@ import { v4 as uuidv4 } from "uuid";
 import { diffWords, Change } from "diff";
 import { DocumentImpl } from "./Document";
 import { AutocompleteOutput } from "./types";
+import { XcodeAutocompleteInput } from "./AutocompleteProtocol";
 
 // interface DiffType {
 //   count: number;
@@ -57,7 +58,7 @@ export class XcodeCompletionProvider {
   }
 
   public async provideInlineCompletionItems(
-    input: AutocompleteInput,
+    input: XcodeAutocompleteInput,
     token: AbortSignal | undefined,
   ): Promise<AutocompleteOutput | undefined> {
     const { filepath, pos, selectedCompletionInfo, injectDetails } = input;

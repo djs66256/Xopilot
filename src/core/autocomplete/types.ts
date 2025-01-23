@@ -204,11 +204,3 @@ export interface Document {
    */
   validatePosition(position: Position): Position;
 }
-
-export interface AutocompleteOutput {
-  id: string;
-  text: string;
-  position: Position;
-  range: Range;
-  replacingLines: string[];
-}
