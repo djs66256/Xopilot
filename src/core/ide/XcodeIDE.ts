@@ -178,11 +178,19 @@ export class XcodeIDE implements IDE {
     return Promise.resolve();
   }
 
-  getOpenFiles(): Promise<string[]> {
-    return Promise.resolve([]);
+  async getOpenFiles(): Promise<string[]> {
+    try {
+      let result = await this.inspectorChannel.request(
+        "ide/getOpenFiles",
+        void 0,
+      );
+      return result;
+    } catch {
+      return [];
+    }
   }
 
-  getCurrentFile(): Promise<
+  async getCurrentFile(): Promise<
     | undefined
     | {
         isUntitled: boolean;
@@ -190,7 +198,15 @@ export class XcodeIDE implements IDE {
         contents: string;
       }
   > {
-    return Promise.resolve(undefined);
+    try {
+      let result = await this.inspectorChannel.request(
+        "ide/getCurrentFile",
+        void 0,
+      );
+      return result;
+    } catch {
+      return undefined;
+    }
   }
 
   getPinnedFiles(): Promise<string[]> {
