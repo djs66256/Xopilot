@@ -79,6 +79,8 @@ export class XcodeCompletionProvider {
         this.abortController.abort();
       }
       const abortController = new AbortController();
+      this.abortController = abortController;
+      
       const signal = abortController.signal;
       const document = new DocumentImpl(this.ide, filepath, docData);
       await document.prepare();
