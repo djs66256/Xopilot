@@ -13,8 +13,8 @@ import { ToIdeFromCoreProtocol } from "core/protocol/ideCore";
 import { ToIdeFromWebviewOrCoreProtocol } from "core/protocol/ide";
 import { XcodeIDE } from "../ide/XcodeIDE";
 import { WebviewChannel } from "./WebviewChannel";
-import { IdeChannel } from "./IdeChannel";
 import { XcodeCompletionProvider } from "../autocomplete/CompletionProvider";
+import { XcodeChannel } from "./XcodeChannel";
 
 type ToIdeOrWebviewFromCoreProtocol = ToIdeFromCoreProtocol &
   ToWebviewFromCoreProtocol;
@@ -58,7 +58,7 @@ export class ProjectMessenger {
       FromCoreProtocol
     >,
     private readonly webviewChannel: WebviewChannel,
-    private readonly ideChannel: IdeChannel | undefined,
+    private readonly inspectorChannel: XcodeChannel | undefined,
     private readonly ide: XcodeIDE,
   ) {
     /** WEBVIEW ONLY LISTENERS **/

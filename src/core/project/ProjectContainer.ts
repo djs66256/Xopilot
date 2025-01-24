@@ -4,7 +4,6 @@ import { Core } from "core/core";
 import { InProcessMessenger } from "core/protocol/messenger";
 import { FromCoreProtocol, ToCoreProtocol } from "core/protocol";
 import { BrowserWindowHost } from "./BrowserWindowHost";
-import { IdeChannel } from "../messages/IdeChannel";
 import { Project } from "./types";
 import { XcodeChannel } from "../messages/XcodeChannel";
 import { SocketIPCServer } from "../ipc/SocketIPCServer";
@@ -13,12 +12,8 @@ import { TabAutocompleteModel } from "../autocomplete/loadAutocompleteModel";
 import { ConfigHandler } from "core/config/ConfigHandler";
 
 export class ProjectContainer {
-  private ide: XcodeIDE;
-
   private configHandler: ConfigHandler;
-  private _insepectChannel: MessageChannel | null = null;
-  private _chatChannel: MessageChannel | null = null;
-  private ideChannel: IdeChannel;
+  
   private inProcessMessenger: InProcessMessenger<
     ToCoreProtocol,
     FromCoreProtocol
@@ -27,8 +22,9 @@ export class ProjectContainer {
   private tabAutocompleteModel: TabAutocompleteModel;
 
   private chatWindow: BrowserWindowHost;
-  private xcodeChannel: XcodeChannel;
+  private inspectorChannel: XcodeChannel;
   private messenger: ProjectMessenger;
+  private ide: XcodeIDE;
   private core: Core;
 
   constructor(
@@ -44,17 +40,16 @@ export class ProjectContainer {
       ToCoreProtocol,
       FromCoreProtocol
     >();
-    this.xcodeChannel = new XcodeChannel(
+    this.inspectorChannel = new XcodeChannel(
       project,
       this.ipcServer,
       this.inProcessMessenger,
     );
-    this.ideChannel = new IdeChannel(project);
-    this.ide = new XcodeIDE(this.xcodeChannel);
+    this.ide = new XcodeIDE(this.inspectorChannel);
     this.messenger = new ProjectMessenger(
       this.inProcessMessenger,
       this.chatWindow.messageChannel,
-      this.ideChannel,
+      this.inspectorChannel,
       this.ide,
     );
     this.core = new Core(
@@ -77,21 +72,17 @@ export class ProjectContainer {
       this.configHandler,
       this.ide,
       this.tabAutocompleteModel,
-      this.xcodeChannel,
+      this.inspectorChannel,
     );
     // } catch (e) {
     //   console.log("Error creating core", e);
     // }
+
+    this.openChatBrowserWindow();
   }
 
   destroy() {
     this.chatWindow.removeAllListeners();
-  }
-
-  set insepectChannel(channel: MessageChannel | null) {}
-
-  get insepectChannel(): MessageChannel | null {
-    return this._insepectChannel;
   }
 
   openChatBrowserWindow(options: { create: Boolean } = { create: true }) {
