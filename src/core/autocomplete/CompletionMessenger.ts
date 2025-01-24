@@ -37,5 +37,9 @@ export class CompletionMessenger {
       );
       return result;
     });
+
+    inspectorChannel.on("autocomplete/accept", async (data) => {
+      await this.completionProvider.acceptCompletion(data);
+    });
   }
 }
