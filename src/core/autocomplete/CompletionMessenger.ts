@@ -29,12 +29,11 @@ export class CompletionMessenger {
         this.abortController.abort();
         this.abortController = undefined;
       }
-      const abortController = new AbortController();
-      this.abortController = abortController;
-      const signal = abortController.signal;
+      this.abortController = new AbortController();
+      
       let result = await this.completionProvider.provideInlineCompletionItems(
         data,
-        signal,
+        this.abortController.signal,
       );
       return result;
     });
