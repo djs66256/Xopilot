@@ -50,7 +50,7 @@ export class ProjectContainer {
       this.inProcessMessenger,
     );
     this.ideChannel = new IdeChannel(project);
-    this.ide = new XcodeIDE();
+    this.ide = new XcodeIDE(this.xcodeChannel);
     this.messenger = new ProjectMessenger(
       this.inProcessMessenger,
       this.chatWindow.messageChannel,
