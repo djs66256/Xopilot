@@ -59,11 +59,9 @@ export class XcodeCompletionProvider {
     console.error("Error in autocomplete: ", e);
   }
 
-  abortController: AbortController | undefined;
-
   public async provideInlineCompletionItems(
     input: XcodeAutocompleteInput,
-    token: AbortSignal | undefined,
+    signal: AbortSignal,
   ): Promise<XcodeAutocompleteOutput | undefined> {
     const {
       filepath,
@@ -75,17 +73,9 @@ export class XcodeCompletionProvider {
     const position = pos;
     try {
       // Abort any previous requests
-      if (this.abortController) {
-        this.abortController.abort();
-      }
-      const abortController = new AbortController();
-      this.abortController = abortController;
-      
-      const signal = abortController.signal;
       const document = new DocumentImpl(this.ide, filepath, docData);
       await document.prepare();
 
-      // token.onCancellationRequested(() => abortController.abort());
 
       // Handle notebook cells
       // const pos = {

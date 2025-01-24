@@ -23,6 +23,7 @@ export class ProjectContainer {
     ToCoreProtocol,
     FromCoreProtocol
   >;
+  private completionMessenger: CompletionMessenger;
   private tabAutocompleteModel: TabAutocompleteModel;
 
   private chatWindow: BrowserWindowHost;
@@ -71,7 +72,7 @@ export class ProjectContainer {
     );
     this.configHandler = this.core.configHandler;
     this.tabAutocompleteModel = new TabAutocompleteModel(this.configHandler);
-    new CompletionMessenger(
+    this.completionMessenger = new CompletionMessenger(
       this.project,
       this.configHandler,
       this.ide,

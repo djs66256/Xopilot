@@ -1,14 +1,14 @@
 import { XcodeIDE } from "../ide/XcodeIDE";
 import { TabAutocompleteModel } from "./loadAutocompleteModel";
-import { XcodeCompletionProvider } from './CompletionProvider'
+import { XcodeCompletionProvider } from "./CompletionProvider";
 import { XcodeChannel } from "../messages/XcodeChannel";
 import { ConfigHandler } from "core/config/ConfigHandler";
 import { Project } from "../project/types";
 
-
 export class CompletionMessenger {
-  private readonly completionProvider: XcodeCompletionProvider
-  
+  private readonly completionProvider: XcodeCompletionProvider;
+  private abortController: AbortController | undefined;
+
   constructor(
     private readonly project: Project,
     private readonly configHandler: ConfigHandler,
@@ -25,7 +25,18 @@ export class CompletionMessenger {
     );
 
     inspectorChannel.on("autocomplete/getSuggestion", async (data) => {
-      return await this.completionProvider.provideInlineCompletionItems(data, undefined)
-    })
+      if (this.abortController) {
+        this.abortController.abort();
+        this.abortController = undefined;
+      }
+      const abortController = new AbortController();
+      this.abortController = abortController;
+      const signal = abortController.signal;
+      let result = await this.completionProvider.provideInlineCompletionItems(
+        data,
+        signal,
+      );
+      return result;
+    });
   }
 }

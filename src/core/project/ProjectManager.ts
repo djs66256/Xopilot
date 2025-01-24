@@ -14,10 +14,11 @@ export class ProjectManager {
   }
 
   getProjectContainer(project: Project): ProjectContainer {
-    let container = this.projects.get(projectIdentifier(project));
+    const key = projectIdentifier(project)
+    let container = this.projects.get(key);
     if (!container) {
       container = new ProjectContainer(project, this.ipcServer);
-      this.projects.set(project.id, container);
+      this.projects.set(key, container);
     }
     return container;
   }
