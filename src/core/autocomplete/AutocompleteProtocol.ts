@@ -1,4 +1,4 @@
-import { Position } from "core";
+import { Position, Range } from "core";
 import { AutocompleteInput } from "core/autocomplete/util/types";
 
 

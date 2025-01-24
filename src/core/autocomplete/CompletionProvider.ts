@@ -13,8 +13,10 @@ import { XcodeChannel } from "../messages/XcodeChannel";
 import { v4 as uuidv4 } from "uuid";
 import { diffWords, Change } from "diff";
 import { DocumentImpl } from "./Document";
-import { AutocompleteOutput } from "./types";
-import { XcodeAutocompleteInput } from "./AutocompleteProtocol";
+import {
+  XcodeAutocompleteInput,
+  XcodeAutocompleteOutput,
+} from "./AutocompleteProtocol";
 
 // interface DiffType {
 //   count: number;
@@ -60,13 +62,19 @@ export class XcodeCompletionProvider {
   public async provideInlineCompletionItems(
     input: XcodeAutocompleteInput,
     token: AbortSignal | undefined,
-  ): Promise<AutocompleteOutput | undefined> {
-    const { filepath, pos, selectedCompletionInfo, injectDetails } = input;
+  ): Promise<XcodeAutocompleteOutput | undefined> {
+    const {
+      filepath,
+      pos,
+      selectedCompletionInfo,
+      injectDetails,
+      document: docData,
+    } = input;
     const position = pos;
     try {
       const abortController = new AbortController();
       const signal = abortController.signal;
-      const document = new DocumentImpl(this.ide, filepath);
+      const document = new DocumentImpl(this.ide, filepath, docData);
       await document.prepare();
 
       // token.onCancellationRequested(() => abortController.abort());

@@ -2,6 +2,7 @@ import { IDE, Position, Range } from "core";
 import { Document, EndOfLine, TextLine } from "./types";
 import fs from "node:fs";
 import { XcodeIDE } from "../ide/XcodeIDE";
+import { XcodeAutocompleteDocument } from "./AutocompleteProtocol";
 
 export class DocumentImpl implements Document {
   private contents: string;
@@ -20,12 +21,13 @@ export class DocumentImpl implements Document {
   constructor(
     public readonly ide: IDE,
     public readonly uri: string,
+    public readonly data: XcodeAutocompleteDocument
   ) {}
 
   async prepare() {
     // from url string get file name
     this.fileName = this.uri.split("/").pop();
-    this.contents = await this.ide.readFile(this.uri);
+    this.contents = this.data.content;
     this.textLines = this.contents.split(this.eolToken).map((line, index) => {
       const textLine: TextLine = {
         lineNumber: index,

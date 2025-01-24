@@ -29,6 +29,9 @@ export interface SocketChannelInfo {
 }
 
 export interface SocketChannel {
+  readonly info: SocketChannelInfo;
+  isEqual(other: SocketChannel): Boolean;
+
   on<T extends keyof ToCoreFromXcodeProtocol>(
     project: Project,
     handler: (
@@ -51,6 +54,13 @@ export class SocketChannel implements SocketChannel {
     readonly projectResolver: (project: Project) => Promise<void>,
   ) {
     this.setup();
+  }
+
+  isEqual(other: SocketChannel): Boolean {
+    return (
+      this.info.id === other.info.id &&
+      this.info.type === other.info.type
+    );
   }
 
   private projectListeners: Map<
