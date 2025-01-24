@@ -108,8 +108,16 @@ export class XcodeIDE implements IDE {
     return getFileStats(files);
   }
 
-  writeFile(path: string, contents: string): Promise<void> {
-    return writeFile(path, contents);
+  async writeFile(path: string, contents: string): Promise<void> {
+    try {
+      let result = await this.inspectorChannel.request("ide/writeFile", {
+        fileUrl: path,
+        content: contents,
+      });
+      if (!result.success) {
+        await writeFile(path, contents);
+      }
+    } catch {}
   }
 
   showVirtualFile(title: string, contents: string): Promise<void> {
@@ -147,8 +155,19 @@ export class XcodeIDE implements IDE {
     return content;
   }
 
-  readRangeInFile(fileUri: string, range: Range): Promise<string> {
-    return Promise.resolve("");
+  async readRangeInFile(fileUri: string, range: Range): Promise<string> {
+    let content: string;
+    try {
+      let result = await this.inspectorChannel.request("ide/readFile", {
+        fileUrl: fileUri,
+        range: range,
+      });
+      content = result.content;
+    } catch {}
+    if (!content) {
+      content = await readFile(fileUri);
+    }
+    return content;
   }
 
   showLines(
