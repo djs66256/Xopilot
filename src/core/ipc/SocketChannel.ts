@@ -52,6 +52,7 @@ export class SocketChannel implements SocketChannel {
     readonly info: SocketChannelInfo,
     private socket: Socket,
     readonly projectResolver: (project: Project) => Promise<void>,
+    readonly timeout: number = 5000,
   ) {
     this.setup();
   }
@@ -97,7 +98,7 @@ export class SocketChannel implements SocketChannel {
     data: ToXcodeFromCoreProtocol[T][0],
   ): Promise<ToXcodeFromCoreProtocol[T][1]> {
     return new Promise((resolve, reject) => {
-      this.socket.emitWithAck(
+      this.socket.timeout(this.timeout).emitWithAck(
         this.encodeEvent(messageType),
         { project, message: data },
         (data: any) => {

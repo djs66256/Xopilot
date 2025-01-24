@@ -80,10 +80,14 @@ export class XcodeChannel implements XcodeChannel {
     data: ToXcodeFromCoreProtocol[T][0],
   ): Promise<ToXcodeFromCoreProtocol[T][1]> {
     return new Promise((resolve, reject) => {
-      this.socketChannel
-        .request(this.project, messageType, data)
-        .then(resolve)
-        .catch(reject);
+      if (this.socketChannel) {
+        this.socketChannel
+          .request(this.project, messageType, data)
+          .then(resolve)
+          .catch(reject);
+      } else {
+        throw new Error("No socket channel");
+      }
     });
   }
 }
