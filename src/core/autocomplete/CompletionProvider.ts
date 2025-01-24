@@ -26,13 +26,6 @@ import {
 // }
 
 export class XcodeCompletionProvider {
-  // private autocompleteCache = AutocompleteLruCache.get();
-  public errorsShown: Set<string> = new Set();
-  // private bracketMatchingService = new BracketMatchingService();
-  // private debouncer = new AutocompleteDebouncer();
-  // private completionStreamer: CompletionStreamer;
-  // private loggingService = new AutocompleteLoggingService();
-  // private contextRetrievalService: ContextRetrievalService;
   private completionProvider: CompletionProvider;
   private recentlyEditedTracker = new RecentlyEditedTracker();
   _lastShownCompletion: AutocompleteOutcome | undefined;
@@ -76,49 +69,8 @@ export class XcodeCompletionProvider {
       const document = new DocumentImpl(this.ide, filepath, docData);
       await document.prepare();
 
-
-      // Handle notebook cells
-      // const pos = {
-      //   line: position.line,
-      //   character: position.character,
-      // };
-      let manuallyPassFileContents: string | undefined = undefined;
-      // if (document.uri.scheme === "vscode-notebook-cell") {
-      //   const notebook = vscode.workspace.notebookDocuments.find((notebook) =>
-      //     notebook
-      //       .getCells()
-      //       .some((cell) =>
-      //         URI.equal(cell.document.uri.toString(), document.uri.toString()),
-      //       ),
-      //   );
-      //   if (notebook) {
-      //     const cells = notebook.getCells();
-      //     manuallyPassFileContents = cells
-      //       .map((cell) => {
-      //         const text = cell.document.getText();
-      //         if (cell.kind === vscode.NotebookCellKind.Markup) {
-      //           return `"""${text}"""`;
-      //         } else {
-      //           return text;
-      //         }
-      //       })
-      //       .join("\n\n");
-      //     for (const cell of cells) {
-      //       if (
-      //         URI.equal(cell.document.uri.toString(), document.uri.toString())
-      //       ) {
-      //         break;
-      //       } else {
-      //         pos.line += cell.document.getText().split("\n").length + 1;
-      //       }
-      //     }
-      //   }
-      // }
-
-      // Manually pass file contents for unsaved, untitled files
-      // if (document.isUntitled) {
-        manuallyPassFileContents = document.getText();
-      // }
+      // Xcode should ALWAYS using manually content
+      let manuallyPassFileContents = document.getText();
 
       // Handle commit message input box
       let manuallyPassPrefix: string | undefined = undefined;
@@ -138,7 +90,7 @@ export class XcodeCompletionProvider {
       };
 
       console.debug(`[AutoComplete] Content of document: ${manuallyPassFileContents}`)
-      // setupStatusBar(undefined, true);
+      
       const outcome =
         await this.completionProvider.provideInlineCompletionItems(
           input,
@@ -165,15 +117,6 @@ export class XcodeCompletionProvider {
       if (selectedCompletionInfo) {
         outcome.completion = selectedCompletionInfo.text + outcome.completion;
       }
-      // const willDisplay = this.willDisplay(
-      //   document,
-      //   selectedCompletionInfo,
-      //   signal,
-      //   outcome,
-      // );
-      // if (!willDisplay) {
-      //   return null;
-      // }
 
       // Mark displayed
       this.completionProvider.markDisplayed(input.completionId, outcome);
@@ -249,19 +192,6 @@ export class XcodeCompletionProvider {
         range: range,
         replacingLines: [],
       };
-
-      // const completionItem = new vscode.InlineCompletionItem(
-      //   completionText,
-      //   range,
-      //   {
-      //     title: "Log Autocomplete Outcome",
-      //     command: "continue.logAutocompleteOutcome",
-      //     arguments: [input.completionId, this.completionProvider],
-      //   },
-      // );
-
-      // (completionItem as any).completeBracketPairs = true;
-      // return [completionItem];
     } finally {
     }
   }
