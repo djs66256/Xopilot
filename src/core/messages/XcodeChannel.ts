@@ -37,7 +37,7 @@ export class XcodeChannel implements XcodeChannel {
       }
     });
     this.ipcServer.on("disconnected", (channel) => {
-      if (channel.isEqual(this.socketChannel)) {
+      if (this.socketChannel && this.socketChannel.isEqual(channel)) {
         this.socketChannel = null;
       }
     });

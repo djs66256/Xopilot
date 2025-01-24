@@ -74,13 +74,36 @@ export class DocumentImpl implements Document {
   //   return this.textLines[position.line];
   // }
   offsetAt(position: Position): number {
-    throw new Error("Method not implemented.");
+    let offset = 0;
+    for (let i = 0; i < position.line; i++) {
+      offset += this.textLines[i].text.length + 1;
+    }
+    offset += position.character;
+    return offset;
   }
   positionAt(offset: number): Position {
-    throw new Error("Method not implemented.");
+    let position = { line: 0, character: 0 };
+    while (offset > 0) {
+      const line = this.textLines[position.line];
+      if (offset < line.text.length + 1) {
+        position.character = offset;
+        break;
+      } else {
+        offset -= line.text.length + 1;
+        position.line++;
+        position.character = 0
+      }
+    }
+    return position;
   }
   getText(range?: Range): string {
-    throw new Error("Method not implemented.");
+    if (range) {
+      const start = this.offsetAt(range.start);
+      const end = this.offsetAt(range.end);
+      return this.contents.substring(start, end);
+    } else {
+      return this.contents;
+    }
   }
   getWordRangeAtPosition(
     position: Position,

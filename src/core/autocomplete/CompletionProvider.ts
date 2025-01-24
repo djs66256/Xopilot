@@ -59,6 +59,8 @@ export class XcodeCompletionProvider {
     console.error("Error in autocomplete: ", e);
   }
 
+  abortController: AbortController | undefined;
+
   public async provideInlineCompletionItems(
     input: XcodeAutocompleteInput,
     token: AbortSignal | undefined,
@@ -72,6 +74,10 @@ export class XcodeCompletionProvider {
     } = input;
     const position = pos;
     try {
+      // Abort any previous requests
+      if (this.abortController) {
+        this.abortController.abort();
+      }
       const abortController = new AbortController();
       const signal = abortController.signal;
       const document = new DocumentImpl(this.ide, filepath, docData);
@@ -118,9 +124,9 @@ export class XcodeCompletionProvider {
       // }
 
       // Manually pass file contents for unsaved, untitled files
-      if (document.isUntitled) {
+      // if (document.isUntitled) {
         manuallyPassFileContents = document.getText();
-      }
+      // }
 
       // Handle commit message input box
       let manuallyPassPrefix: string | undefined = undefined;
@@ -139,6 +145,7 @@ export class XcodeCompletionProvider {
         injectDetails,
       };
 
+      console.debug(`[AutoComplete] Content of document: ${manuallyPassFileContents}`)
       // setupStatusBar(undefined, true);
       const outcome =
         await this.completionProvider.provideInlineCompletionItems(
