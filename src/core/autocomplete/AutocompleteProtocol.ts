@@ -39,5 +39,5 @@ export interface XcodeAutocompleteOutput {
 
 
 export type AutocompleteFromXcodeToCoreProtocol = {
-    "autocomplete/getSuggestion": [XcodeAutocompleteInput, XcodeAutocompleteOutput];
+    "autocomplete/getSuggestion": [XcodeAutocompleteInput, XcodeAutocompleteOutput[]];
 }

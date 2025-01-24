@@ -82,8 +82,10 @@ export class SocketIPCServer extends EventEmitter {
       socket.on("disconnect", (reason) => {
         console.debug("[SIPC] socket disconnect: " + reason);
         const channel = this.channels.get(socket.id);
-        channel.disconnect();
-        this.emit("disconnected", channel);
+        if (channel) {
+          channel.disconnect();
+          this.emit("disconnected", channel);
+        }
         this.channels.delete(socket.id);
       });
     });
