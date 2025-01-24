@@ -38,41 +38,42 @@ const gotoCache = new Map<string, RangeInFile[]>();
 export async function executeGotoProvider(
   input: GotoInput,
 ): Promise<RangeInFile[]> {
-  const cacheKey = gotoInputKey(input);
-  const cached = gotoCache.get(cacheKey);
-  if (cached) {
-    return cached;
-  }
+  throw new Error("Not implemented");
+  // const cacheKey = gotoInputKey(input);
+  // const cached = gotoCache.get(cacheKey);
+  // if (cached) {
+  //   return cached;
+  // }
 
-  try {
-    const definitions = (await vscode.commands.executeCommand(
-      input.name,
-      input.uri,
-      new vscode.Position(input.line, input.character),
-    )) as any;
+  // try {
+  //   const definitions = (await vscode.commands.executeCommand(
+  //     input.name,
+  //     input.uri,
+  //     new vscode.Position(input.line, input.character),
+  //   )) as any;
 
-    const results = definitions
-      .filter((d: any) => (d.targetUri || d.uri) && (d.targetRange || d.range))
-      .map((d: any) => ({
-        filepath: (d.targetUri || d.uri).toString(),
-        range: d.targetRange || d.range,
-      }));
+  //   const results = definitions
+  //     .filter((d: any) => (d.targetUri || d.uri) && (d.targetRange || d.range))
+  //     .map((d: any) => ({
+  //       filepath: (d.targetUri || d.uri).toString(),
+  //       range: d.targetRange || d.range,
+  //     }));
 
-    // Add to cache
-    if (gotoCache.size >= MAX_CACHE_SIZE) {
-      // Remove the oldest item from the cache
-      const oldestKey = gotoCache.keys().next().value;
-      if (oldestKey) {
-        gotoCache.delete(oldestKey);
-      }
-    }
-    gotoCache.set(cacheKey, results);
+  //   // Add to cache
+  //   if (gotoCache.size >= MAX_CACHE_SIZE) {
+  //     // Remove the oldest item from the cache
+  //     const oldestKey = gotoCache.keys().next().value;
+  //     if (oldestKey) {
+  //       gotoCache.delete(oldestKey);
+  //     }
+  //   }
+  //   gotoCache.set(cacheKey, results);
 
-    return results;
-  } catch (e) {
-    console.warn(`Error executing ${input.name}:`, e);
-    return [];
-  }
+  //   return results;
+  // } catch (e) {
+  //   console.warn(`Error executing ${input.name}:`, e);
+  //   return [];
+  // }
 }
 
 function isRifWithContents(

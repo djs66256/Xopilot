@@ -1,10 +1,14 @@
-import { AutocompleteInput, AutocompleteOutcome } from "core/autocomplete/util/types"
+import {
+  AutocompleteInput,
+  AutocompleteOutcome,
+} from "core/autocomplete/util/types";
 import { AutocompleteFromXcodeToCoreProtocol } from "../autocomplete/AutocompleteProtocol";
+import {
+  IDEFromCoreToXcodeProtocol,
+  IDEFromXcodeToCoreProtocol,
+} from "../ide/XcodeIDEProtocol";
 
+export type ToCoreFromXcodeProtocol = AutocompleteFromXcodeToCoreProtocol &
+  IDEFromXcodeToCoreProtocol & {};
 
-export type ToCoreFromXcodeProtocol = AutocompleteFromXcodeToCoreProtocol & {
-}
-
-export type ToXcodeFromCoreProtocol = {
-  
-}
+export type ToXcodeFromCoreProtocol = AutocompleteFromXcodeToCoreProtocol & IDEFromCoreToXcodeProtocol & {};

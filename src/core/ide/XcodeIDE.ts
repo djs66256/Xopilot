@@ -30,8 +30,11 @@ import type {
   ToastType,
   FileStatsMap,
 } from "core";
+import { XcodeChannel } from "../messages/XcodeChannel";
 
 export class XcodeIDE implements IDE {
+  constructor(readonly inspectorChannel: XcodeChannel) {}
+
   getIdeInfo(): Promise<IdeInfo> {
     return Promise.resolve({
       ideType: "xcode",
@@ -129,8 +132,19 @@ export class XcodeIDE implements IDE {
     return Promise.resolve();
   }
 
-  readFile(fileUri: string): Promise<string> {
-    return readFile(fileUri);
+  async readFile(fileUri: string): Promise<string> {
+    let content: string;
+    try {
+      let result = await this.inspectorChannel.request("ide/readFile", {
+        fileUrl: fileUri,
+        range: undefined,
+      });
+      content = result.content;
+    } catch {}
+    if (!content) {
+      content = await readFile(fileUri);
+    }
+    return content;
   }
 
   readRangeInFile(fileUri: string, range: Range): Promise<string> {

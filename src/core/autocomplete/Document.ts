@@ -1,7 +1,5 @@
 import { IDE, Position, Range } from "core";
 import { Document, EndOfLine, TextLine } from "./types";
-import fs from "node:fs";
-import { XcodeIDE } from "../ide/XcodeIDE";
 import { XcodeAutocompleteDocument } from "./AutocompleteProtocol";
 
 export class DocumentImpl implements Document {
@@ -70,9 +68,7 @@ export class DocumentImpl implements Document {
       return this.textLines[position.line];
     }
   }
-  // lineAt(position: Position): TextLine {
-  //   return this.textLines[position.line];
-  // }
+  
   offsetAt(position: Position): number {
     let offset = 0;
     for (let i = 0; i < position.line; i++) {
