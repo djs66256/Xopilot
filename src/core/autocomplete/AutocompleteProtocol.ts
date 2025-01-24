@@ -1,7 +1,6 @@
 import { Position, Range } from "core";
 import { AutocompleteInput } from "core/autocomplete/util/types";
 
-
 /*
    public var content: String
     /// Every line has a trailing newline character.
@@ -16,13 +15,13 @@ import { AutocompleteInput } from "core/autocomplete/util/types";
 */
 
 export interface XcodeAutocompleteDocument {
-    content: string;
-    lines: string[];
-    uti: string;
-    cursorPosition: Position;
-    cursorOffset: number;
-    selections: Range[];
-    tabSize: number;
+  content: string;
+  lines: string[];
+  uti: string;
+  cursorPosition: Position;
+  cursorOffset: number;
+  selections: Range[];
+  tabSize: number;
 }
 
 export interface XcodeAutocompleteInput extends AutocompleteInput {
@@ -37,7 +36,14 @@ export interface XcodeAutocompleteOutput {
   replacingLines: string[];
 }
 
+export interface XcodeAutocompleteAcceptInput {
+  completionId: string;
+}
 
 export type AutocompleteFromXcodeToCoreProtocol = {
-    "autocomplete/getSuggestion": [XcodeAutocompleteInput, XcodeAutocompleteOutput[]];
-}
+  "autocomplete/getSuggestion": [
+    XcodeAutocompleteInput,
+    XcodeAutocompleteOutput[],
+  ];
+  "autocomplete/accept": [XcodeAutocompleteAcceptInput, void];
+};

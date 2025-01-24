@@ -14,6 +14,7 @@ import { v4 as uuidv4 } from "uuid";
 import { diffWords, Change } from "diff";
 import { DocumentImpl } from "./Document";
 import {
+  XcodeAutocompleteAcceptInput,
   XcodeAutocompleteInput,
   XcodeAutocompleteOutput,
 } from "./AutocompleteProtocol";
@@ -192,6 +193,10 @@ export class XcodeCompletionProvider {
       replacingLines: [],
     };
     return [completion];
+  }
+
+  acceptCompletion(input: XcodeAutocompleteAcceptInput) {
+    this.completionProvider.accept(input.completionId);
   }
 }
 
