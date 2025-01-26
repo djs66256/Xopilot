@@ -100,7 +100,7 @@ export class SocketChannel implements SocketChannel {
     return new Promise((resolve, reject) => {
       this.socket.timeout(this.timeout).emitWithAck(
         this.encodeEvent(messageType),
-        { project, message: data },
+        this.encode({ project, message: data }),
         (data: any) => {
           const responseJson = this.decode(data);
           if (responseJson.code !== 0) {
@@ -175,11 +175,10 @@ export class SocketChannel implements SocketChannel {
         return;
       }
 
-      const str = data.toString("utf-8");
-      const json = JSON.parse(str);
+      const json = this.decode(data);
       const project: Project = json.project;
       const message = json.message;
-      console.debug(`[SIPC] received: (${messageType}) ${str}`);
+      console.debug(`[SIPC] received: (${messageType}) ${data.toString('utf-8')}`);
 
       this.projectResolver(project)
         .then(() => {
