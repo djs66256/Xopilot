@@ -45,7 +45,7 @@ export class ProjectContainer {
       this.ipcServer,
       this.inProcessMessenger,
     );
-    this.ide = new XcodeIDE(this.inspectorChannel);
+    this.ide = new XcodeIDE(project, this.inspectorChannel);
     this.messenger = new ProjectMessenger(
       this.inProcessMessenger,
       this.chatWindow.messageChannel,

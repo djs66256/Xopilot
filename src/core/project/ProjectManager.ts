@@ -13,6 +13,10 @@ export class ProjectManager {
     }
   }
 
+  getLastestProjectContainer(): ProjectContainer | undefined {
+    return this.projects.values().next().value;
+  }
+
   getProjectContainer(project: Project): ProjectContainer {
     const key = projectIdentifier(project)
     let container = this.projects.get(key);

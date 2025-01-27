@@ -29,13 +29,17 @@ export interface GetCurrentFileOutput {
   contents: string;
 }
 
+export interface ProjectWrapper {
+  project: Project;
+}
+
 export interface IDEFromCoreToXcodeProtocol {
   "ide/getIdeInfo": [void, IdeInfo];
   "ide/getWorkspaces": [void, WorkspaceInfo[]];
   "ide/readFile": [ReadFileInput, ReadFileOutput];
   "ide/writeFile": [WriteFileInput, WriteFileOutput];
-  "ide/getOpenFiles": [void, string[]];
-  "ide/getCurrentFile": [void, GetCurrentFileOutput];
+  "ide/getOpenFiles": [ProjectWrapper, string[]];
+  "ide/getCurrentFile": [ProjectWrapper, GetCurrentFileOutput];
   "ide/getProblems": [string | undefined, Problem[]];
   // "ide/getAvailableThreads": [Thread[]];
   // "ide/getBranch": [string];

@@ -83,7 +83,9 @@ export class BrowserWindowHost extends EventEmitter {
 
     // Open the DevTools.
     if (process.env.NODE_ENV === "development") {
-      mainWindow.webContents.openDevTools();
+      setTimeout(() => {
+        mainWindow.webContents.openDevTools();
+      }, 1_000);
     }
     // mainWindow.webContents.openDevTools();
 

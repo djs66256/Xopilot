@@ -31,9 +31,12 @@ import type {
   FileStatsMap,
 } from "core";
 import { XcodeChannel } from "../messages/XcodeChannel";
+import { Project } from "../project/types";
 
 export class XcodeIDE implements IDE {
-  constructor(readonly inspectorChannel: XcodeChannel) {}
+  constructor(
+    readonly project: Project,
+    readonly inspectorChannel: XcodeChannel) {}
 
   getIdeInfo(): Promise<IdeInfo> {
     return Promise.resolve({
@@ -182,7 +185,7 @@ export class XcodeIDE implements IDE {
     try {
       let result = await this.inspectorChannel.request(
         "ide/getOpenFiles",
-        void 0,
+        {project: this.project},
       );
       return result;
     } catch {
@@ -201,7 +204,7 @@ export class XcodeIDE implements IDE {
     try {
       let result = await this.inspectorChannel.request(
         "ide/getCurrentFile",
-        void 0,
+        {project: this.project},
       );
       return result;
     } catch {

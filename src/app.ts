@@ -36,8 +36,10 @@ export class App {
   onActivate() {
     if (BrowserWindow.getAllWindows().length === 0) {
       // TODO: MAY open settings window?
-      const projectContainer =
-        this.projectManager.getProjectContainer(emptyProject);
+      let projectContainer = this.projectManager.getLastestProjectContainer()
+      if (!projectContainer) {
+        projectContainer = this.projectManager.getProjectContainer(emptyProject);
+      }
       projectContainer.openChatBrowserWindow();
     }
   }

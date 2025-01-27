@@ -21,7 +21,7 @@ type Response<T> = {
   data: T;
 };
 
-export type SocketChannelType = "inspector" | "extension"
+export type SocketChannelType = "inspector" | "extension";
 
 export interface SocketChannelInfo {
   id: string;
@@ -58,10 +58,7 @@ export class SocketChannel implements SocketChannel {
   }
 
   isEqual(other: SocketChannel): Boolean {
-    return (
-      this.info.id === other.info.id &&
-      this.info.type === other.info.type
-    );
+    return this.info.id === other.info.id && this.info.type === other.info.type;
   }
 
   private projectListeners: Map<
@@ -97,19 +94,20 @@ export class SocketChannel implements SocketChannel {
     messageType: T,
     data: ToXcodeFromCoreProtocol[T][0],
   ): Promise<ToXcodeFromCoreProtocol[T][1]> {
-    return new Promise((resolve, reject) => {
-      this.socket.timeout(this.timeout).emitWithAck(
-        this.encodeEvent(messageType),
-        this.encode({ project, message: data }),
-        (data: any) => {
-          const responseJson = this.decode(data);
-          if (responseJson.code !== 0) {
-            reject(responseJson);
-          } else {
-            resolve(responseJson.data);
-          }
-        },
-      );
+    return new Promise(async (resolve, reject) => {
+      let response = await this.socket
+        .timeout(this.timeout)
+        .emitWithAck(
+          this.encodeEvent(messageType),
+          this.encode({ project, message: data }),
+        );
+
+      const responseJson = this.decode(response);
+      if (responseJson.code !== 0) {
+        reject(responseJson);
+      } else {
+        resolve(responseJson.data);
+      }
     });
   }
 
@@ -178,11 +176,15 @@ export class SocketChannel implements SocketChannel {
       const json = this.decode(data);
       const project: Project = json.project;
       const message = json.message;
-      console.debug(`[SIPC] received: (${messageType}) ${data.toString('utf-8')}`);
+      console.debug(
+        `[SIPC] received: (${messageType}) ${data.toString("utf-8")}`,
+      );
 
       this.projectResolver(project)
         .then(() => {
-          const listener = this.projectListeners.get(projectIdentifier(project));
+          const listener = this.projectListeners.get(
+            projectIdentifier(project),
+          );
           // console.log(this, this.projectListeners, listener)
           if (!listener) {
             console.error("[SIPC] no listener for " + JSON.stringify(project));
@@ -203,7 +205,9 @@ export class SocketChannel implements SocketChannel {
           }
         })
         .catch((e) => {
-          console.error("[SIPC] failed to resolve project: " + JSON.stringify(project));
+          console.error(
+            "[SIPC] failed to resolve project: " + JSON.stringify(project),
+          );
           error(e);
         });
     });
