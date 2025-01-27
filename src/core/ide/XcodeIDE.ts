@@ -184,7 +184,7 @@ export class XcodeIDE implements IDE {
     try {
       let result = await this.inspectorChannel.request(
         "ide/getOpenFiles",
-        {project: this.project},
+        void 0,
       );
       return result;
     } catch {
@@ -203,7 +203,7 @@ export class XcodeIDE implements IDE {
     try {
       let result = await this.inspectorChannel.request(
         "ide/getCurrentFile",
-        {project: this.project},
+        void 0,
       );
       return result;
     } catch {
