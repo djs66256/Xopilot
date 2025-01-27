@@ -1,5 +1,5 @@
 import { XcodeIDE } from "../ide/XcodeIDE";
-import { ProjectMessenger } from "../messages/ProjectMessenger";
+import { ProjectMessenger } from "../ide/ProjectMessenger";
 import { Core } from "core/core";
 import { InProcessMessenger } from "core/protocol/messenger";
 import { FromCoreProtocol, ToCoreProtocol } from "core/protocol";

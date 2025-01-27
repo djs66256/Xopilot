@@ -11,10 +11,10 @@ import {
 } from "core/protocol/passThrough";
 import { ToIdeFromCoreProtocol } from "core/protocol/ideCore";
 import { ToIdeFromWebviewOrCoreProtocol } from "core/protocol/ide";
-import { XcodeIDE } from "../ide/XcodeIDE";
-import { WebviewChannel } from "./WebviewChannel";
+import { XcodeIDE } from "./XcodeIDE";
+import { WebviewChannel } from "../messages/WebviewChannel";
 import { XcodeCompletionProvider } from "../autocomplete/CompletionProvider";
-import { XcodeChannel } from "./XcodeChannel";
+import { XcodeChannel } from "../messages/XcodeChannel";
 
 type ToIdeOrWebviewFromCoreProtocol = ToIdeFromCoreProtocol &
   ToWebviewFromCoreProtocol;
