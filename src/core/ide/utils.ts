@@ -91,15 +91,16 @@ export function listDir(fileUri: string): Promise<[string, FileType][]> {
     const Directory = 2;
     if (path) {
       fs.readdir(path, { withFileTypes: true }, (err, files) => {
-        if (err) {
-          reject(err);
+        if (files) {
+          resolve(
+            files.map((file) => [
+              file.name,
+              file.isDirectory() ? Directory : File,
+            ]),
+          );
+        } else {
+          reject(err ?? "Error reading directory");
         }
-        resolve(
-          files.map((file) => [
-            file.name,
-            file.isDirectory() ? Directory : File,
-          ]),
-        );
       });
     } else {
       reject("Invalid file path");
