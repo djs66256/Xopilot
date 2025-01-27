@@ -15,35 +15,52 @@ export async function getClipboardContent(): Promise<{
 }
 
 export async function fileExists(fileUri: string): Promise<boolean> {
-  return fs.existsSync(fileUri);
+  const path = fileURLToPath(fileUri);
+  if (path) {
+    return fs.existsSync(path);
+  } else {
+    return false;
+  }
 }
 
 export async function readFile(fileUri: string): Promise<string> {
   const filepath = fileURLToPath(fileUri);
   return new Promise((resolve, reject) => {
-    fs.readFile(
-      filepath,
-      {
-        encoding: "utf8",
-      },
-      (err, contents) => {
-        if (err) {
-          reject(err);
-        }
-        resolve(contents);
-      },
-    );
+    if (filepath) {
+      fs.readFile(
+        filepath,
+        {
+          encoding: "utf8",
+        },
+        (err, contents) => {
+          if (err) {
+            reject(err);
+          }
+          resolve(contents);
+        },
+      );
+    } else {
+      reject(new Error("Invalid file path"));
+    }
   });
 }
 
-export async function writeFile(path: string, contents: string): Promise<void> {
+export async function writeFile(
+  fileUri: string,
+  contents: string,
+): Promise<void> {
+  const path = fileURLToPath(fileUri);
   return new Promise((resolve, reject) => {
-    fs.writeFile(path, contents, (err) => {
-      if (err) {
-        reject(err);
-      }
-      resolve();
-    });
+    if (path) {
+      fs.writeFile(path, contents, (err) => {
+        if (err) {
+          reject(err);
+        }
+        resolve();
+      });
+    } else {
+      reject(new Error("Invalid file path"));
+    }
   });
 }
 
@@ -53,34 +70,40 @@ export async function openUrl(url: string): Promise<void> {
 }
 
 export async function getFileStats(files: string[]): Promise<FileStatsMap> {
-  return Promise.all(
-    files.map(async (file) => {
-      const stat = await fs.promises.stat(file);
-      return {
-        lastModified: stat.mtimeMs,
-        size: stat.size,
-      };
-    }),
-  ).then((stats) => {
-    return files.reduce((acc, file, i) => {
-      acc[file] = stats[i];
-      return acc;
-    }, {} as FileStatsMap);
+  const stats = files.map((file) => {
+    const path = fileURLToPath(file);
+    const stat = fs.statSync(path);
+    return {
+      lastModified: stat.mtimeMs,
+      size: stat.size,
+    };
   });
+  return files.reduce((acc, file, i, _) => {
+    acc[file] = stats[i];
+    return acc;
+  }, {} as FileStatsMap);
 }
 
-export async function listDir(dir: string): Promise<[string, FileType][]> {
+export function listDir(fileUri: string): Promise<[string, FileType][]> {
+  const path = fileURLToPath(fileUri);
   return new Promise((resolve, reject) => {
     const File = 1;
     const Directory = 2;
-    fs.readdir(dir, { withFileTypes: true }, (err, files) => {
-      if (err) {
-        reject(err);
-      }
-      resolve(
-        files.map((file) => [file.name, file.isDirectory() ? Directory : File]),
-      );
-    });
+    if (path) {
+      fs.readdir(path, { withFileTypes: true }, (err, files) => {
+        if (err) {
+          reject(err);
+        }
+        resolve(
+          files.map((file) => [
+            file.name,
+            file.isDirectory() ? Directory : File,
+          ]),
+        );
+      });
+    } else {
+      reject("Invalid file path");
+    }
   });
 }
 
