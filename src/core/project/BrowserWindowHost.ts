@@ -22,7 +22,7 @@ export class BrowserWindowHost extends EventEmitter {
 
   messageChannel: WebviewChannel
 
-  constructor(project: Project) {
+  constructor(readonly project: Project) {
     super();
     
     this.messageChannel = new WebviewChannel(project)
@@ -59,6 +59,10 @@ export class BrowserWindowHost extends EventEmitter {
       },
       ...options
     });
+
+    mainWindow.webContents.executeJavaScript(
+      `window.XIPC_PROJECT = ${JSON.stringify(this.project)}`
+    )
 
     // and load the index.html of the app.
     if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
