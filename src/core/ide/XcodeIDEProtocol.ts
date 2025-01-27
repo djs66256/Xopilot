@@ -2,7 +2,7 @@ import { IdeInfo, Problem, Range } from "core";
 import { Project } from "../project/types";
 
 export interface WorkspaceInfo {
-
+  dir: string;
 }
 
 export interface ReadFileInput {

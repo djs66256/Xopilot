@@ -95,8 +95,9 @@ export class XcodeIDE implements IDE {
     return Promise.resolve([]);
   }
 
-  getWorkspaceDirs(): Promise<string[]> {
-    return Promise.resolve([]);
+  async getWorkspaceDirs(): Promise<string[]> {
+    let result = await this.inspectorChannel.request("ide/getWorkspaces", void 0)
+    return result.map(workspace => workspace.dir)
   }
 
   getWorkspaceConfigs(): Promise<ContinueRcJson[]> {
@@ -112,15 +113,13 @@ export class XcodeIDE implements IDE {
   }
 
   async writeFile(path: string, contents: string): Promise<void> {
-    try {
-      let result = await this.inspectorChannel.request("ide/writeFile", {
-        fileUrl: path,
-        content: contents,
-      });
-      if (!result.success) {
-        await writeFile(path, contents);
-      }
-    } catch {}
+    let result = await this.inspectorChannel.request("ide/writeFile", {
+      fileUrl: path,
+      content: contents,
+    });
+    if (!result.success) {
+      await writeFile(path, contents);
+    }
   }
 
   showVirtualFile(title: string, contents: string): Promise<void> {
