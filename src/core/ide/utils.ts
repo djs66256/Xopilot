@@ -3,7 +3,7 @@ import os from "node:os";
 import fs from "node:fs";
 import { fileURLToPath } from "node:url";
 import clipboard from "clipboardy";
-import type { FileStatsMap, FileType } from "core";
+import type { FileType, FileStatsMap } from "core";
 
 export async function getClipboardContent(): Promise<{
   text: string;
@@ -71,15 +71,14 @@ export async function getFileStats(files: string[]): Promise<FileStatsMap> {
 
 export async function listDir(dir: string): Promise<[string, FileType][]> {
   return new Promise((resolve, reject) => {
+    const File = 1;
+    const Directory = 2;
     fs.readdir(dir, { withFileTypes: true }, (err, files) => {
       if (err) {
         reject(err);
       }
       resolve(
-        files.map((file) => [
-          file.name,
-          file.isDirectory() ? FileType.Directory : FileType.File,
-        ]),
+        files.map((file) => [file.name, file.isDirectory() ? Directory : File]),
       );
     });
   });
